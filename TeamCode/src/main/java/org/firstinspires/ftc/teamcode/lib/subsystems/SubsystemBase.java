@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.lib.subsystems;
 
 /**
- * Base subsystem class. This shouldn't be used directly.
+ * Base subsystem class. This shouldn't be used directly. Instead, classes should subclass this to implement their own subsystems.
  */
 public abstract class SubsystemBase {
     /**
