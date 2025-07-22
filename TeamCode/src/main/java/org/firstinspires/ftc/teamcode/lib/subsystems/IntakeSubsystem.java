@@ -31,5 +31,5 @@ public class IntakeSubsystem extends SubsystemBase {
         this.telemetry = telemetry;
     }
 
-    // TODO: Add methods to actually do stuff!
+    // TODO: Add methods to actually do stuff! (And use them inside the Robot class!)
 }
