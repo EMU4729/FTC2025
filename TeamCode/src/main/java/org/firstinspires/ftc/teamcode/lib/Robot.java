@@ -51,5 +51,7 @@ public class Robot {
      */
     public void teleopPeriodic() {
         // TODO: Add any teleop loop code here (this would be a great place to put button bindings!)
+        // For example, here's code to get the robot driving field-relative:
+        drive.driveFieldRelative(gamepad.left_stick_x, -gamepad.left_stick_y, gamepad.right_stick_x);
     }
 }
