@@ -7,6 +7,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.lib.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.ExtensionSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.LiftSubsystem;
+import org.firstinspires.ftc.teamcode.lib.subsystems.OuttakeSubsystem;
 
 public class Robot {
     private final DriveSubsystem drive;
@@ -15,6 +16,7 @@ public class Robot {
     private final LiftSubsystem lift;
     private final Telemetry telemetry;
     private final HardwareMap hardwareMap;
+    private final OuttakeSubsystem outtake;
     private final Gamepad gamepad;
 
     public Robot(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad) {
@@ -22,6 +24,7 @@ public class Robot {
         extension = new ExtensionSubsystem(hardwareMap, telemetry);
 //        intake = new IntakeSubsystem(hardwareMap, telemetry);
         lift = new LiftSubsystem(hardwareMap, telemetry);
+        outtake = new OuttakeSubsystem(hardwareMap, telemetry);
 
         this.hardwareMap = hardwareMap;
         this.telemetry = telemetry;
@@ -66,6 +69,14 @@ public class Robot {
         } else if (gamepad.dpad_left) {
             lift.setTargetPosition(0.65);
         }
+
+        if (gamepad.left_trigger>0.2){
+            outtake.grab();
+        }
+        if (gamepad.right_trigger>0.2){
+            outtake.score();
+        }
+
 
         // drive bindings
         drive.driveRobotRelative(gamepad.left_stick_x, -gamepad.left_stick_y, gamepad.right_stick_x);
