@@ -47,6 +47,7 @@ public class LiftSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        // simple proportional controller to make the lift go to the target height
         int position = (leftMotor.getCurrentPosition() + rightMotor.getCurrentPosition()) / 2;
         int error = targetPosition - position;
         double power = error * CONTROLLER_KP + CONTROLLER_FF;
