@@ -6,6 +6,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class IntakeSubsystem extends SubsystemBase {
+    /**
+     * Instances of this class represent preset positions of the gripper, pivot and rotation servos.
+     * <p>
+     * Some preset states are also included in this class as static members. Ask Leon for the meanings of the cloud, ground and hover states.
+     */
     public static class State {
         public static final State CLOUD = new State(0.5, 0.62, -0.13);
         public static final State GROUND = new State(0.05, 0.82, 0.18);
@@ -34,8 +39,10 @@ public class IntakeSubsystem extends SubsystemBase {
         leftRotateServo = hardwareMap.get(Servo.class, "iLR");
         rightRotateServo = hardwareMap.get(Servo.class, "iRR");
         gripServo = hardwareMap.get(Servo.class, "iG");
+
         pivot.setDirection(Servo.Direction.REVERSE);
         rightRotateServo.setDirection(Servo.Direction.REVERSE);
+
         applyState(State.HOVER);
 
         this.telemetry = telemetry;
@@ -46,6 +53,11 @@ public class IntakeSubsystem extends SubsystemBase {
         updateTelemetry();
     }
 
+    /**
+     * Applies the given state to the pivot, grip and rotation servos, setting their positions.
+     *
+     * @param state The state to apply.
+     */
     public void applyState(State state) {
         currentState = state;
         pivot.setPosition(state.pivot);
@@ -55,8 +67,8 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     private void updateTelemetry() {
-        telemetry.addData("Intake Grip Dist", currentState.grip);
-        telemetry.addData("Intake Pivot Dist", currentState.pivot);
-        telemetry.addData("Intake Rotate Dist", currentState.rotate);
+        telemetry.addData("Intake Grip Position", currentState.grip);
+        telemetry.addData("Intake Pivot Position", currentState.pivot);
+        telemetry.addData("Intake Rotate Position", currentState.rotate);
     }
 }

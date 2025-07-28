@@ -38,6 +38,8 @@ public class ExtensionSubsystem extends SubsystemBase {
     }
 
     private void updateTelemetry() {
+        // The left and right servos are guaranteed to have the same commanded position, so it
+        // doesn't matter which one we use here
         telemetry.addData("Extension Distance", leftServo.getPosition());
     }
 }
