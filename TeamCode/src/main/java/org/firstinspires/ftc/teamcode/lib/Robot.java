@@ -18,9 +18,10 @@ public class Robot {
     private final Telemetry telemetry;
     private final HardwareMap hardwareMap;
     private final OuttakeSubsystem outtake;
-    private final Gamepad gamepad;
+    private final Gamepad gamepad1;
+    private final Gamepad gamepad2;
 
-    public Robot(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad) {
+    public Robot(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad1, Gamepad gamepad2) {
         drive = new DriveSubsystem(hardwareMap, telemetry);
         extension = new ExtensionSubsystem(hardwareMap, telemetry);
         intake = new IntakeSubsystem(hardwareMap, telemetry);
@@ -29,7 +30,8 @@ public class Robot {
 
         this.hardwareMap = hardwareMap;
         this.telemetry = telemetry;
-        this.gamepad = gamepad;
+        this.gamepad1 = gamepad1;
+        this.gamepad2 = gamepad2;
     }
 
     /**
@@ -56,41 +58,41 @@ public class Robot {
      */
     public void teleopPeriodic() {
         // extension bindings
-        if (gamepad.left_bumper) {
+        if (gamepad2.left_bumper) {
             extension.set(0);
         }
-        if (gamepad.right_bumper) {
+        if (gamepad2.right_bumper) {
             extension.set(1);
         }
 
         // lift bindings
-        if (gamepad.dpad_down) {
+        if (gamepad2.dpad_down) {
             lift.setTargetHeight(0);
-        } else if (gamepad.dpad_up) {
+        } else if (gamepad2.dpad_up) {
             lift.setTargetHeight(0.8);
-        } else if (gamepad.dpad_left) {
+        } else if (gamepad2.dpad_left) {
             lift.setTargetHeight(0.65);
         }
 
         // outtake binds
-        if (gamepad.left_trigger > 0.2) {
+        if (gamepad2.left_trigger > 0.2) {
             outtake.grab();
-        } else if (gamepad.right_trigger > 0.2) {
+        } else if (gamepad2.right_trigger > 0.2) {
             outtake.score();
         }
 
         // intake binds
-        if (gamepad.a) {
+        if (gamepad2.a) {
             intake.applyState(IntakeSubsystem.State.HOVER);
-        } else if (gamepad.b) {
+        } else if (gamepad2.b) {
             intake.applyState(IntakeSubsystem.State.GROUND);
-        } else if (gamepad.x) {
+        } else if (gamepad2.x) {
             intake.applyState(IntakeSubsystem.State.CLOUD);
         }
 
 
         // drive bindings
-        drive.driveRobotRelative(-gamepad.left_stick_y, gamepad.left_stick_x, gamepad.right_stick_x);
+        drive.driveRobotRelative(-gamepad2.left_stick_y, gamepad2.left_stick_x, gamepad2.right_stick_x);
     }
 
     /**
