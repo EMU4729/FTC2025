@@ -6,23 +6,19 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class ExtensionSubsystem extends SubsystemBase {
-    /**
-     * The preset distances for the extension.
-     */
-    public static class Distances {
-        public static final double EXTENDED = 1;
-        public static final double RETRACTED = 0;
-    }
+    private static final double EXTENDED_DISTANCE = 0.36;
+    private static final double RETRACTED_DISTANCE = 0.54;
 
     private final Servo leftServo;
     private final Servo rightServo;
     private final Telemetry telemetry;
 
     public ExtensionSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
-        leftServo = hardwareMap.get(Servo.class, "leftExtensionServo");
-        rightServo = hardwareMap.get(Servo.class, "rightExtensionServo");
+        leftServo = hardwareMap.get(Servo.class, "eL");
+        rightServo = hardwareMap.get(Servo.class, "eR");
+        rightServo.setDirection(Servo.Direction.REVERSE);
         this.telemetry = telemetry;
-        set(Distances.RETRACTED);
+        set(0);
     }
 
     @Override
@@ -33,11 +29,12 @@ public class ExtensionSubsystem extends SubsystemBase {
     /**
      * Sets the distance of the extension.
      *
-     * @param distance The desired distance. It's recommended to use the distances presets in {@link Distances}.
+     * @param extension The desired extension percentage, in the range [0, 1].
      */
-    public void set(double distance) {
-        leftServo.setPosition(distance);
-        rightServo.setPosition(distance);
+    public void set(double extension) {
+        double position = extension * (EXTENDED_DISTANCE) + (1 - extension) * RETRACTED_DISTANCE;
+        leftServo.setPosition(position);
+        rightServo.setPosition(position);
     }
 
     private void updateTelemetry() {

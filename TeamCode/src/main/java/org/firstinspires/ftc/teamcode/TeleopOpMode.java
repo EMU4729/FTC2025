@@ -11,7 +11,7 @@ public class TeleopOpMode extends OpMode {
 
     @Override
     public void init() {
-        robot = new Robot(hardwareMap, telemetry, gamepad1);
+        robot = new Robot(hardwareMap, telemetry, gamepad2);
     }
 
     @Override

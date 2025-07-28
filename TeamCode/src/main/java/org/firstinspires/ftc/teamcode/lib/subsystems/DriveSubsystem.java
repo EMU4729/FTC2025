@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.lib.subsystems;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
@@ -21,6 +22,11 @@ public class DriveSubsystem extends SubsystemBase {
         frontRight = hardwareMap.get(DcMotor.class, "rightFront");
         rearLeft = hardwareMap.get(DcMotor.class, "leftRear");
         rearRight = hardwareMap.get(DcMotor.class, "rightRear");
+
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        rearRight.setDirection(DcMotorSimple.Direction.FORWARD);
 
         imu = hardwareMap.get(IMU.class, "imu");
         final IMU.Parameters params = new IMU.Parameters(
@@ -79,9 +85,9 @@ public class DriveSubsystem extends SubsystemBase {
      */
     public void driveFieldRelative(double x, double y, double r) {
         // https://en.wikipedia.org/wiki/Rotation_matrix
-        double yaw = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-        double robotRelativeY = x * Math.cos(yaw) + y * Math.sin(yaw);
-        double robotRelativeX = -x * Math.sin(yaw) + y * Math.cos(yaw);
+        double offset = -imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        double robotRelativeY = x * Math.cos(offset) + y * Math.sin(offset);
+        double robotRelativeX = -x * Math.sin(offset) + y * Math.cos(offset);
         driveRobotRelative(robotRelativeX, robotRelativeY, r);
     }
 
@@ -90,5 +96,6 @@ public class DriveSubsystem extends SubsystemBase {
         telemetry.addData("FR Drive Power", frontRight.getPower());
         telemetry.addData("BL Drive Power", rearLeft.getPower());
         telemetry.addData("BR Drive Power", rearRight.getPower());
+        telemetry.addData("Robot Yaw", imu.getRobotYawPitchRollAngles().getYaw());
     }
 }
