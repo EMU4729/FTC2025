@@ -23,11 +23,10 @@ public class DriveSubsystem extends SubsystemBase {
         rearRight = hardwareMap.get(DcMotor.class, "rightRear");
 
         imu = hardwareMap.get(IMU.class, "imu");
-        // TODO: Change this if necessary
         final IMU.Parameters params = new IMU.Parameters(
                 new RevHubOrientationOnRobot(
-                        RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD,
-                        RevHubOrientationOnRobot.UsbFacingDirection.LEFT
+                        RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                        RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
                 )
         );
         imu.initialize(params);
