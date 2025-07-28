@@ -6,15 +6,20 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class IntakeSubsystem extends SubsystemBase {
-    /**
-     * Preset servo values to use.
-     */
-    public static class Stops {
-        // Pitch Servo Stops
-        public static final double ROLL_SERVO_FORWARD = 0;
-        public static final double ROLL_SERVO_DOWN = 0;
+    public static class State {
+        public static final State CLOUD = new State(0.5, 0.62, -0.13);
+        public static final State GROUND = new State(0.05, 0.82, 0.18);
+        public static final State HOVER = new State(0.05, 0.43, 0.2);
 
-        // TODO: Add more
+        public double grip;
+        public double pivot;
+        public double rotate;
+
+        public State(double grip, double pivot, double rotate) {
+            this.grip = grip;
+            this.pivot = pivot;
+            this.rotate = rotate;
+        }
     }
 
     private final Servo pivot;
@@ -22,6 +27,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private final Servo rightRotateServo;
     private final Servo gripServo;
     private final Telemetry telemetry;
+    private State currentState;
 
     public IntakeSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         pivot = hardwareMap.get(Servo.class, "iP");
@@ -29,15 +35,44 @@ public class IntakeSubsystem extends SubsystemBase {
         rightRotateServo = hardwareMap.get(Servo.class, "iRR");
         gripServo = hardwareMap.get(Servo.class, "iG");
         pivot.setDirection(Servo.Direction.REVERSE);
-        pivot.setPosition(0);
+        rightRotateServo.setDirection(Servo.Direction.REVERSE);
+        applyState(State.HOVER);
 
         this.telemetry = telemetry;
     }
 
+    @Override
+    public void periodic() {
+        updateTelemetry();
+    }
 
 
+    public void applyState(State state) {
+        currentState = state;
+        pivot.setPosition(state.pivot);
+        gripServo.setPosition(state.grip);
+        leftRotateServo.setPosition(state.rotate);
+        rightRotateServo.setPosition(state.rotate);
+    }
 
+    public void alterPivot(double delta) {
+        currentState.pivot += delta;
+        applyState(currentState);
+    }
 
+    public void alterGrip(double delta) {
+        currentState.grip += delta;
+        applyState(currentState);
+    }
 
-    // TODO: Add methods to actually do stuff! (And use them inside the Robot class!)
+    public void alterRotate(double delta) {
+        currentState.rotate += delta;
+        applyState(currentState);
+    }
+
+    private void updateTelemetry() {
+        telemetry.addData("Intake Grip Dist", currentState.grip);
+        telemetry.addData("Intake Pivot Dist", currentState.pivot);
+        telemetry.addData("Intake Rotate Dist", currentState.rotate);
+    }
 }

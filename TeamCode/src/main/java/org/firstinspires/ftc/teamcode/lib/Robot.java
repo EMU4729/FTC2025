@@ -6,13 +6,14 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.lib.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.ExtensionSubsystem;
+import org.firstinspires.ftc.teamcode.lib.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.OuttakeSubsystem;
 
 public class Robot {
     private final DriveSubsystem drive;
     private final ExtensionSubsystem extension;
-    //    private final IntakeSubsystem intake;
+    private final IntakeSubsystem intake;
     private final LiftSubsystem lift;
     private final Telemetry telemetry;
     private final HardwareMap hardwareMap;
@@ -22,7 +23,7 @@ public class Robot {
     public Robot(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad) {
         drive = new DriveSubsystem(hardwareMap, telemetry);
         extension = new ExtensionSubsystem(hardwareMap, telemetry);
-//        intake = new IntakeSubsystem(hardwareMap, telemetry);
+        intake = new IntakeSubsystem(hardwareMap, telemetry);
         lift = new LiftSubsystem(hardwareMap, telemetry);
         outtake = new OuttakeSubsystem(hardwareMap, telemetry);
 
@@ -36,7 +37,7 @@ public class Robot {
      */
     public void periodic() {
         drive.periodic();
-//        intake.periodic();
+        intake.periodic();
         lift.periodic();
         extension.periodic();
     }
@@ -55,9 +56,10 @@ public class Robot {
         // TODO: Add any teleop loop code here (this would be a great place to put button bindings!)
 
         // extension bindings
-        if (gamepad.a) {
+        if (gamepad.left_bumper) {
             extension.set(0);
-        } else if (gamepad.b) {
+        }
+        if (gamepad.right_bumper) {
             extension.set(1);
         }
 
@@ -65,20 +67,36 @@ public class Robot {
         if (gamepad.dpad_down) {
             lift.setTargetPosition(0);
         } else if (gamepad.dpad_up) {
-            lift.setTargetPosition(1);
+            lift.setTargetPosition(0.8);
         } else if (gamepad.dpad_left) {
             lift.setTargetPosition(0.65);
         }
 
-        if (gamepad.left_trigger>0.2){
+        // outtake binds
+        if (gamepad.left_trigger > 0.2) {
             outtake.grab();
         }
-        if (gamepad.right_trigger>0.2){
+        if (gamepad.right_trigger > 0.2) {
             outtake.score();
+        }
+
+        // intake binds
+        if (gamepad.a) {
+            intake.applyState(IntakeSubsystem.State.HOVER);
+        } else if (gamepad.b) {
+            intake.applyState(IntakeSubsystem.State.GROUND);
+        } else if (gamepad.x) {
+            intake.applyState(IntakeSubsystem.State.CLOUD);
         }
 
 
         // drive bindings
-        drive.driveRobotRelative(gamepad.left_stick_x, -gamepad.left_stick_y, gamepad.right_stick_x);
+        drive.driveRobotRelative(-gamepad.left_stick_y, gamepad.left_stick_x, gamepad.right_stick_x);
+    }
+
+    /**
+     * This method should be called regularly in the teleop testing opmode.
+     */
+    public void teleopTestPeriodic() {
     }
 }
