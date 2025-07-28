@@ -65,11 +65,11 @@ public class Robot {
 
         // lift bindings
         if (gamepad.dpad_down) {
-            lift.setTargetPosition(0);
+            lift.setTargetHeight(0);
         } else if (gamepad.dpad_up) {
-            lift.setTargetPosition(0.8);
+            lift.setTargetHeight(0.8);
         } else if (gamepad.dpad_left) {
-            lift.setTargetPosition(0.65);
+            lift.setTargetHeight(0.65);
         }
 
         // outtake binds

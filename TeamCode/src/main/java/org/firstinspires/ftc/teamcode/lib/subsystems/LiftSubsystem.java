@@ -60,9 +60,9 @@ public class LiftSubsystem extends SubsystemBase {
     /**
      * Sets the target height of the lift.
      *
-     * @param percent The target height percentage.
+     * @param percent The target height percentage, in the range [0, 1].
      */
-    public void setTargetPosition(double percent) {
+    public void setTargetHeight(double percent) {
         targetPosition = (int) (percent * MAX);
     }
 
