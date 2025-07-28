@@ -64,7 +64,7 @@ public class Robot {
         } else if (gamepad.dpad_up) {
             lift.setTargetPosition(1);
         } else if (gamepad.dpad_left) {
-            lift.setTargetPosition(0.5);
+            lift.setTargetPosition(0.65);
         }
 
         // drive bindings
