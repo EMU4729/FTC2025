@@ -46,28 +46,12 @@ public class IntakeSubsystem extends SubsystemBase {
         updateTelemetry();
     }
 
-
     public void applyState(State state) {
         currentState = state;
         pivot.setPosition(state.pivot);
         gripServo.setPosition(state.grip);
         leftRotateServo.setPosition(state.rotate);
         rightRotateServo.setPosition(state.rotate);
-    }
-
-    public void alterPivot(double delta) {
-        currentState.pivot += delta;
-        applyState(currentState);
-    }
-
-    public void alterGrip(double delta) {
-        currentState.grip += delta;
-        applyState(currentState);
-    }
-
-    public void alterRotate(double delta) {
-        currentState.rotate += delta;
-        applyState(currentState);
     }
 
     private void updateTelemetry() {

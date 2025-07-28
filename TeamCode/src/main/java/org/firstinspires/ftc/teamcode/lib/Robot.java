@@ -46,15 +46,15 @@ public class Robot {
      * This method should be called only once when a teleop opmode starts.
      */
     public void teleopInit() {
-        // TODO: Add any teleop init code here
+        // If we ever need any initialization code, this is where to keep it.
     }
 
     /**
      * This method should be called once every robot loop in teleop opmodes only.
+     * <p>
+     * This is a good place to keep all gamepad button bindings.
      */
     public void teleopPeriodic() {
-        // TODO: Add any teleop loop code here (this would be a great place to put button bindings!)
-
         // extension bindings
         if (gamepad.left_bumper) {
             extension.set(0);
@@ -96,6 +96,8 @@ public class Robot {
 
     /**
      * This method should be called regularly in the teleop testing opmode.
+     * <p>
+     * This is a good place to keep any testing code that should not be used in competition.
      */
     public void teleopTestPeriodic() {
     }
