@@ -37,5 +37,7 @@ public class IntakeCalibrationTeleOp extends OpMode {
         }
 
         intake.applyState(intakeState);
+
+        telemetry.update();
     }
 }
