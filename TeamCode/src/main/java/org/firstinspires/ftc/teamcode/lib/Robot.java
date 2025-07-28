@@ -75,8 +75,7 @@ public class Robot {
         // outtake binds
         if (gamepad.left_trigger > 0.2) {
             outtake.grab();
-        }
-        if (gamepad.right_trigger > 0.2) {
+        } else if (gamepad.right_trigger > 0.2) {
             outtake.score();
         }
 
