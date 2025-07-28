@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.lib.subsystems.IntakeSubsystem;
 
 @TeleOp(name = "Intake Calibration")
-public class IntakeCalibrationTeleOp extends OpMode {
+public class IntakeCalibrationOpMode extends OpMode {
     IntakeSubsystem intake;
     IntakeSubsystem.State intakeState;
 
