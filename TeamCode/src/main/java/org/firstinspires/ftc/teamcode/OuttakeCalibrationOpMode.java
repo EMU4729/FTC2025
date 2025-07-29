@@ -57,6 +57,7 @@ public class OuttakeCalibrationOpMode extends OpMode {
 
         outtake.unsafe_setAllPositions(grab, leftPivot, rightPivot, leftRotate, rightRotate);
 
+        outtake.periodic();
         telemetry.update();
     }
 }
