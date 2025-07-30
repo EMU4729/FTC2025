@@ -91,6 +91,13 @@ public class DriveSubsystem extends SubsystemBase {
         driveRobotRelative(robotRelativeX, robotRelativeY, r);
     }
 
+    /**
+     * Stops driving. Equivalent to <code>driveRobotRelative(0, 0, 0)</code>.
+     */
+    public void stop() {
+        driveRobotRelative(0, 0, 0);
+    }
+
     private void updateTelemetry() {
         telemetry.addData("FL Drive Power", frontLeft.getPower());
         telemetry.addData("FR Drive Power", frontRight.getPower());

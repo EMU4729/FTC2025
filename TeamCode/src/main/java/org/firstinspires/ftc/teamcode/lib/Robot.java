@@ -11,10 +11,10 @@ import org.firstinspires.ftc.teamcode.lib.subsystems.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.OuttakeSubsystem;
 
 public class Robot {
-    private final DriveSubsystem drive;
-    private final ExtensionSubsystem extension;
-    private final IntakeSubsystem intake;
-    private final LiftSubsystem lift;
+    public final DriveSubsystem drive;
+    public final ExtensionSubsystem extension;
+    public final IntakeSubsystem intake;
+    public final LiftSubsystem lift;
     private final Telemetry telemetry;
     private final HardwareMap hardwareMap;
     private final OuttakeSubsystem outtake;
@@ -92,7 +92,7 @@ public class Robot {
             intake.applyState(IntakeSubsystem.State.CLOUD);
         }
 
-        if (gamepad2.left_stick_button){
+        if (gamepad2.left_stick_button) {
             outtake.close();
         }
 
