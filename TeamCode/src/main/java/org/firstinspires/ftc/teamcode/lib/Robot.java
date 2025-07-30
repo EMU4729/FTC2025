@@ -11,6 +11,11 @@ import org.firstinspires.ftc.teamcode.lib.subsystems.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.OuttakeSubsystem;
 
 public class Robot {
+    /**
+     * Code version number - make sure to update this before you deploy!
+     */
+    private static final int VERSION_NUMBER = 0;
+
     public final DriveSubsystem drive;
     public final ExtensionSubsystem extension;
     public final IntakeSubsystem intake;
@@ -42,6 +47,7 @@ public class Robot {
         intake.periodic();
         lift.periodic();
         extension.periodic();
+        telemetry.addData("Code Version", VERSION_NUMBER);
     }
 
     /**
