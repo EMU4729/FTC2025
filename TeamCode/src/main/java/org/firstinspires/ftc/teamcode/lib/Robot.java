@@ -65,10 +65,10 @@ public class Robot {
      */
     public void teleopPeriodic() {
         // extension bindings
-        if (gamepad2.left_bumper) {
+        if (gamepad1.left_bumper) {
             extension.set(0);
         }
-        if (gamepad2.right_bumper) {
+        if (gamepad1.right_bumper) {
             extension.set(1);
         }
 
@@ -90,11 +90,11 @@ public class Robot {
         }
 
         // intake binds
-        if (gamepad2.a) {
+        if (gamepad1.a) {
             intake.applyState(IntakeSubsystem.State.HOVER);
-        } else if (gamepad2.b) {
+        } else if (gamepad1.b) {
             intake.applyState(IntakeSubsystem.State.GROUND);
-        } else if (gamepad2.x) {
+        } else if (gamepad1.x) {
             intake.applyState(IntakeSubsystem.State.CLOUD);
         }
 
