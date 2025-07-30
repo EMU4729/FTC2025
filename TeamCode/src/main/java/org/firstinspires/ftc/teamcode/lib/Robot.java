@@ -49,6 +49,7 @@ public class Robot {
      */
     public void teleopInit() {
         // If we ever need any initialization code, this is where to keep it.
+        outtake.init();
     }
 
     /**
@@ -76,6 +77,7 @@ public class Robot {
 
         // outtake binds
         if (gamepad2.left_trigger > 0.2) {
+            intake.applyState(IntakeSubsystem.State.GRAB);
             outtake.grab();
         } else if (gamepad2.right_trigger > 0.2) {
             outtake.score();
@@ -90,9 +92,21 @@ public class Robot {
             intake.applyState(IntakeSubsystem.State.CLOUD);
         }
 
+        if (gamepad2.left_stick_button){
+            outtake.close();
+        }
+
+        if (gamepad2.right_stick_button) {
+            outtake.open();
+        }
+
+        if (gamepad2.dpad_right) {
+            intake.applyState(IntakeSubsystem.State.GRAB);
+        }
+
 
         // drive bindings
-        drive.driveRobotRelative(-gamepad2.left_stick_y, gamepad2.left_stick_x, gamepad2.right_stick_x);
+        drive.driveRobotRelative(-gamepad2.left_stick_y, gamepad2.left_stick_x, -gamepad2.right_stick_x);
     }
 
     /**

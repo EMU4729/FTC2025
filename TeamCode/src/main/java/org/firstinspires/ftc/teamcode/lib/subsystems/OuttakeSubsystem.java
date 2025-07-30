@@ -8,14 +8,14 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class OuttakeSubsystem extends SubsystemBase {
     // TODO: Modify these using values obtained from the Outtake Calibration OpMode.
     // NOTE: You will probably need to go into the `grab` and `score` methods below and modify code there, in addition to these constants.
-    private final static double grabOpen = 0.82;
-    private final static double grabClose = 0.65;
+    private final static double grabOpen = 0; //.82
+    private final static double grabClose = 0.27; //.65
     private final static double pivotGrab = 0.1;
     private final static double pivotScore = 0.8;
-    private final static double outtakeRotateLeftSpecimenScore = 0.24; //  diff. 0.88 should be closer to 0.9 in my opinion this is full rotate
-    private final static double outtakeRotateRightSpecimenScore = 0.88; //^ diff
+    private final static double outtakeRotateLeftSpecimenScore = 1; //.24  diff. 0.88 should be closer to 0.9 in my opinion this is full rotate
+    private final static double outtakeRotateRightSpecimenScore = 0.9; //.88^ diff
     private final static double outtakeRotateSpecimenGrab = 0.9;
-    private final static double outtakePivotSpecimenGrab = 0.1; // grab position
+    private final static double outtakePivotSpecimenGrab = 0.1; //.1 grab position
     private final static double outtakePivotSpecimenScore = 0.8;
 
     private final Servo grab;
@@ -46,27 +46,37 @@ public class OuttakeSubsystem extends SubsystemBase {
     }
 
     public void init() {
-        leftPivot.setPosition(pivotGrab - 0.085);
-        rightPivot.setPosition(pivotGrab - 0.085);
-        leftRotateServo.setPosition(0.74 + 0.21);
-        rightRotateServo.setPosition(0.32 + 0.21);
+        leftPivot.setPosition(0.3);
+        rightPivot.setPosition(0.3);
+        leftRotateServo.setPosition(0.5); //0.74 + 0.21
+        rightRotateServo.setPosition(0.5); //0.32 + 0.21
     }
 
     public void score() {
         // WARN: This method does not set the grab servo distance, which seems problematic.
         // You might want to add a call to `setGrabOpen` or `setGrabClose` here.
-        leftRotateServo.setPosition(outtakeRotateLeftSpecimenScore);
-        rightRotateServo.setPosition(outtakeRotateRightSpecimenScore);
-        leftPivot.setPosition(outtakePivotSpecimenScore);
-        rightPivot.setPosition(outtakePivotSpecimenScore);
+        leftRotateServo.setPosition(0.95);
+        rightRotateServo.setPosition(0.16);
+        leftPivot.setPosition(0.9);
+        rightPivot.setPosition(0.9);
     }
 
     public void grab() {
         // WARN: This method is only setting the pivot servo distances, not the grab or rotate servos.
         // This seems problematic. I'd suggest adding calls to `left/rightRotateServo.setPosition` and
         // `setGrabOpen`/`setGrabClose` here.
+        leftRotateServo.setPosition(1);
+        rightRotateServo.setPosition(0.9);
         leftPivot.setPosition(outtakePivotSpecimenGrab);
         rightPivot.setPosition(outtakePivotSpecimenGrab);
+    }
+
+    public void close() {
+        grab.setPosition(0.27);
+    }
+
+    public void open(){
+        grab.setPosition(0);
     }
 
     public void setGrabOpen() {

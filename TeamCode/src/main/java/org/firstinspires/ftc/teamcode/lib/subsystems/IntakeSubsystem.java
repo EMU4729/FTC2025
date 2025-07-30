@@ -12,9 +12,11 @@ public class IntakeSubsystem extends SubsystemBase {
      * Some preset states are also included in this class as static members. Ask Leon for the meanings of the cloud, ground and hover states.
      */
     public static class State {
-        public static final State CLOUD = new State(0.5, 0.62, -0.13);
-        public static final State GROUND = new State(0.05, 0.82, 0.18);
+        public static final State CLOUD = new State(0.4, 0.62, 0.25);
+        public static final State GROUND = new State(0.05, 0.8, 0.16);
         public static final State HOVER = new State(0.05, 0.43, 0.2);
+
+        public static final State GRAB = new State(0.05,-0.55,0.7);
 
         public double grip;
         public double pivot;
