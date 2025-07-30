@@ -23,5 +23,6 @@ public class TestOpMode extends OpMode {
     public void loop() {
         robot.teleopTestPeriodic();
         robot.periodic();
+        telemetry.update();
     }
 }

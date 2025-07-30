@@ -23,5 +23,6 @@ public class TeleopOpMode extends OpMode {
     public void loop() {
         robot.teleopPeriodic();
         robot.periodic();
+        telemetry.update();
     }
 }
