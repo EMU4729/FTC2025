@@ -7,16 +7,23 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class ShooterSubsystem extends SubsystemBase{
-
-    private static enum State{
+public class ShooterSubsystem extends SubsystemBase {
+    private enum State {
         LIFT,
         SHOOTER
     }
 
+    private static final double LIFT_DISTANCE_PER_TICK = 1;
+    private static final double TICKS_PER_SHOOTER_ROTATION = 1;
+    private static final double LIFT_PTO_POS = 1;// TODO: change values
+    private static final double SHOOTER_PTO_POS = 0;// TODO: change values
+    private static final double SHOOTER_PID_P = 0;
+    private static final double SHOOTER_PID_I = 0;
+    private static final double SHOOTER_PID_D = 0;
+    private static final double LIFT_PID_P = 0;
+
     private State state = State.SHOOTER;
     private int liftPosition = 0;
-
 
     private final DcMotorEx leftMotor;
     private final DcMotorEx rightMotor;
@@ -24,23 +31,11 @@ public class ShooterSubsystem extends SubsystemBase{
     private final Servo ptoServo;
     private final Servo arcServo;
 
-    private final static double DISTANCE_PER_ROTATION = 1;
-    private final static double LIFT_PTO_POS = 1;// TODO: change values
-    private final static double SHOOTER_PTO_POS = 0;// TODO: change values
-
     public ShooterSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         leftMotor = hardwareMap.get(DcMotorEx.class, "shooterL");
         rightMotor = hardwareMap.get(DcMotorEx.class, "shooterR");
         ptoServo = hardwareMap.get(Servo.class, "shooterPTO");
         arcServo = hardwareMap.get(Servo.class, "shooterArc");
-    }
-
-    private void liftGoTo(double pos){
-
-
-        int _pos = (int) (pos/DISTANCE_PER_ROTATION);
-        leftMotor.setTargetPosition(_pos-liftPosition);
-        rightMotor.setTargetPosition(_pos-liftPosition);
     }
 
     /**
@@ -54,44 +49,50 @@ public class ShooterSubsystem extends SubsystemBase{
         switch (newState) {
             case LIFT:
                 ptoServo.setPosition(LIFT_PTO_POS);
-                leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-                break;
-            case SHOOTER:
-                liftPosition += leftMotor.getCurrentPosition();
                 leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                leftMotor.setPositionPIDFCoefficients(LIFT_PID_P);
+                rightMotor.setPositionPIDFCoefficients(LIFT_PID_P);
+                break;
+
+            case SHOOTER:
+                liftPosition += leftMotor.getCurrentPosition();
 
                 ptoServo.setPosition(SHOOTER_PTO_POS);
-
                 leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                leftMotor.setVelocityPIDFCoefficients(0, 0, 0, 0);
                 rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                rightMotor.setVelocityPIDFCoefficients(0, 0, 0, 0);
+                leftMotor.setVelocityPIDFCoefficients(SHOOTER_PID_P, SHOOTER_PID_I, SHOOTER_PID_D, 0);
+                rightMotor.setVelocityPIDFCoefficients(SHOOTER_PID_P, SHOOTER_PID_I, SHOOTER_PID_D, 0);
                 break;
         }
 
         state = newState;
     }
 
-
-
-
-    public void liftUp() {
+    /**
+     * sets left right motor target position to given distance
+     *
+     * @param pos the distance in m
+     */
+    private void liftGoTo(double pos) {
         setPTOState(State.LIFT);
-
-        // ...
+        int _pos = (int) (pos / LIFT_DISTANCE_PER_TICK);
+        leftMotor.setTargetPosition(_pos - liftPosition);
+        rightMotor.setTargetPosition(_pos - liftPosition);
     }
-    public void liftDown() {
-        setPTOState(State.LIFT);
 
-        // ...
-    }
-    public void shoot() {
+    /**
+     * sets left & right motors to a given velocity
+     *
+     * @param vel the target velocity of the shooter in ticks/second
+     * @param arc The position of the arc servo, in the range [0, 1].
+     */
+    public void shoot(double vel, double arc) {
         setPTOState(State.SHOOTER);
-
-
-        // ...
+        leftMotor.setVelocity(vel * TICKS_PER_SHOOTER_ROTATION);
+        rightMotor.setVelocity(vel * TICKS_PER_SHOOTER_ROTATION);
+        arcServo.setPosition(arc);
     }
 }
