@@ -16,9 +16,9 @@ public class IntakeSubsystem extends SubsystemBase {
 
     /**
      * Spin the intake motor for intake
-     * @param spin Motor power in [-1, 1]
+     * @param power Motor power between [-1, 1]
      */
-    public void rotateSpinMotor(double spin) {
+    public void setPower(double power) {
         spinMotor.setPower(spin);
     }
 }
