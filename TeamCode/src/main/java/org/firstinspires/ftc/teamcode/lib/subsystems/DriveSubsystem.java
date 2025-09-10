@@ -18,10 +18,10 @@ public class DriveSubsystem extends SubsystemBase {
     private final Telemetry telemetry;
 
     public DriveSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
-        frontLeft = hardwareMap.get(DcMotor.class, "leftFront");
-        frontRight = hardwareMap.get(DcMotor.class, "rightFront");
-        rearLeft = hardwareMap.get(DcMotor.class, "leftRear");
-        rearRight = hardwareMap.get(DcMotor.class, "rightRear");
+        frontLeft = hardwareMap.get(DcMotor.class, "driveFL");
+        frontRight = hardwareMap.get(DcMotor.class, "driveFR");
+        rearLeft = hardwareMap.get(DcMotor.class, "driveRL");
+        rearRight = hardwareMap.get(DcMotor.class, "driveRR");
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
