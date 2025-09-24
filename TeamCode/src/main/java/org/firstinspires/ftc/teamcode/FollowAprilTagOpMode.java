@@ -44,7 +44,7 @@ public class FollowAprilTagOpMode extends OpMode {
         telemetry.update();
     }
 
-    private Optional<Double> GetAprilTagCenterX() {
+    private Optional<Double> getAprilTagCenterX() {
         // currently just tells how many april tags are seen
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         telemetry.addData("# AprilTags Detected", currentDetections.size());
