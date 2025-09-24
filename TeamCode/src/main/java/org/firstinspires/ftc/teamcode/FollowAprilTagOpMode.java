@@ -36,7 +36,7 @@ public class FollowAprilTagOpMode extends OpMode {
     public void loop() {
         robot.periodic();
 
-        GetAprilTagCenterX().ifPresent((val) -> turnVal = val);
+        getAprilTagCenterX().ifPresent((val) -> turnVal = val);
 
         double error = turnVal - 0.5;
         robot.drive.driveRobotRelative(0, 0, error);
