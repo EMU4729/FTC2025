@@ -59,9 +59,5 @@ public class FollowAprilTagOpMode extends OpMode {
             AprilTagDetection detected_tag = currentDetections.get(0);
             return Optional.of(detected_tag.center.x);
         }
-        //AprilTagDetection detection = currentDetections.get(0);
-
-
-
     }
 }
