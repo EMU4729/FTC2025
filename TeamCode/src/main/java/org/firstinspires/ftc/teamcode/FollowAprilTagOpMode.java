@@ -41,9 +41,6 @@ public class FollowAprilTagOpMode extends OpMode {
         double error = turnVal - 0.5;
         robot.drive.driveRobotRelative(0, 0, error);
 
-
-        // rotate code here - todo
-
         telemetry.update();
     }
 
