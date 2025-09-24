@@ -34,7 +34,6 @@ public class FollowAprilTagOpMode extends OpMode {
 
     @Override
     public void loop() {
-        //robot.teleopPeriodic(); // no driving
         robot.periodic();
 
         GetAprilTagCenterX().ifPresent((val) -> turnVal = val);
