@@ -15,13 +15,7 @@ public class TestOpMode extends OpMode {
     }
 
     @Override
-    public void start() {
-        robot.teleopInit();
-    }
-
-    @Override
     public void loop() {
-        robot.teleopTestPeriodic();
         robot.periodic();
         telemetry.update();
     }

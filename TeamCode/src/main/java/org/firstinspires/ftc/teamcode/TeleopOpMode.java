@@ -16,12 +16,11 @@ public class TeleopOpMode extends OpMode {
 
     @Override
     public void start() {
-        robot.teleopInit();
     }
 
     @Override
     public void loop() {
-        robot.teleopPeriodic();
+        robot.drive.driveRobotRelative(-gamepad2.left_stick_y, gamepad2.left_stick_x, -gamepad2.right_stick_x);
         robot.periodic();
         telemetry.update();
     }
