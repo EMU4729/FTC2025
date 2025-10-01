@@ -12,6 +12,17 @@ import com.qualcomm.robotcore.hardware.SwitchableLight;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class IndexSubsystem extends SubsystemBase {
+    /**
+     * The different modes of operation of the indexer
+     */
+    private enum Mode {
+        IDLE,
+        INTAKE,
+        SHOOT,
+        CLOCKWISE,
+        ANTICLOCKWISE,
+    }
+
     private static final float COLOR_SENSOR_GAIN = 1;
     private static final float[] PURPLE_MIN_HSV = new float[]{0, 0, 0};
     private static final float[] PURPLE_MAX_HSV = new float[]{0, 0, 0};
@@ -28,6 +39,7 @@ public class IndexSubsystem extends SubsystemBase {
     private final AnalogInput encoder;
     private final NormalizedColorSensor colorSensor;
     private final Ball[] storage = new Ball[]{Ball.EMPTY, Ball.EMPTY, Ball.EMPTY};
+    private Mode mode = Mode.IDLE;
 
     public IndexSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         servo = hardwareMap.get(Servo.class, "indexServo");
@@ -98,8 +110,17 @@ public class IndexSubsystem extends SubsystemBase {
         return (int) (getCurrentRotation() / ((2.0 / 3.0) * Math.PI));
     }
 
-    @Override
-    public void periodic() {
+    /**
+     * Sets the indexer to move to the nearest intake slot
+     */
+    public void setMode(Mode newMode) {
+        mode = newMode;
+    }
+
+    /**
+     * detects balls entering the indexer using the color sensor and updates the internal storage array
+     */
+    private void detectEnteringBalls() {
         float[] hsv = getHSV();
         if (hsvInRange(hsv, PURPLE_MIN_HSV, PURPLE_MAX_HSV)) {
             int index = getStorageIntakeIndex();
@@ -107,6 +128,24 @@ public class IndexSubsystem extends SubsystemBase {
         } else if (hsvInRange(hsv, GREEN_MIN_HSV, GREEN_MAX_HSV)) {
             int index = getStorageIntakeIndex();
             storage[index] = Ball.GREEN;
+        }
+    }
+
+    @Override
+    public void periodic() {
+        detectEnteringBalls();
+
+        switch (mode) {
+            case IDLE:
+                servo.setPosition(0.5);
+                break;
+            case CLOCKWISE:
+                servo.setPosition(1);
+                break;
+            case ANTICLOCKWISE:
+                servo.setPosition(0);
+                break;
+            // TODO: add logic for the intake and shooting modes
         }
     }
 }
