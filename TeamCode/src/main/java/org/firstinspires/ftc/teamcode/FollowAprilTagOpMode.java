@@ -24,7 +24,7 @@ public class FollowAprilTagOpMode extends OpMode {
         robot = new Robot(hardwareMap, telemetry, gamepad1, gamepad2);
         aprilTag = AprilTagProcessor.easyCreateWithDefaults();
         VisionPortal.easyCreateWithDefaults(
-                hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTag);
+                hardwareMap.get(WebcamName.class, "webcam"), aprilTag);
     }
 
     @Override
