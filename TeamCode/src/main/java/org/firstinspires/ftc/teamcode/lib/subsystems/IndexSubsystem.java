@@ -15,7 +15,7 @@ public class IndexSubsystem extends SubsystemBase {
     /**
      * The different modes of operation of the indexer
      */
-    private enum Mode {
+    public enum Mode {
         IDLE,
         INTAKE,
         SHOOT,
