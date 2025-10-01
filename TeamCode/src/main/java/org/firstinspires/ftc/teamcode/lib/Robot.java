@@ -7,6 +7,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.lib.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.IndexSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.lib.subsystems.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.ShooterSubsystem;
 
 public class Robot {
@@ -18,7 +19,7 @@ public class Robot {
     public final DriveSubsystem drive;
     public final IndexSubsystem index;
     public final IntakeSubsystem intake;
-
+    public final LiftSubsystem lift;
     public final ShooterSubsystem shooter;
 
     private final Telemetry telemetry;
@@ -30,7 +31,7 @@ public class Robot {
         drive = new DriveSubsystem(hardwareMap, telemetry);
         index = new IndexSubsystem(hardwareMap, telemetry);
         intake = new IntakeSubsystem(hardwareMap, telemetry);
-
+        lift = new LiftSubsystem(hardwareMap, telemetry);
         shooter = new ShooterSubsystem(hardwareMap, telemetry);
 
         this.hardwareMap = hardwareMap;
@@ -46,7 +47,7 @@ public class Robot {
         drive.periodic();
         index.periodic();
         intake.periodic();
-
+        lift.periodic();
         shooter.periodic();
         telemetry.addData("Code Version", VERSION_NUMBER);
     }
