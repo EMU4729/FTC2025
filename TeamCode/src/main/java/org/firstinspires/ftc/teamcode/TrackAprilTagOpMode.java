@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.lib.Robot;
+import org.firstinspires.ftc.teamcode.lib.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -12,16 +12,16 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.Optional;
 
-@TeleOp(name = "FollowAprilTag")
-public class FollowAprilTagOpMode extends OpMode {
-    Robot robot;
+@TeleOp(name = "Track AprilTag (IAC Demo)")
+public class TrackAprilTagOpMode extends OpMode {
+    DriveSubsystem drive;
 
     private AprilTagProcessor aprilTag;
     private double turnVal;
 
     @Override
     public void init() {
-        robot = new Robot(hardwareMap, telemetry, gamepad1, gamepad2);
+        drive = new DriveSubsystem(hardwareMap, telemetry);
         aprilTag = AprilTagProcessor.easyCreateWithDefaults();
         VisionPortal.easyCreateWithDefaults(
                 hardwareMap.get(WebcamName.class, "webcam"), aprilTag);
@@ -34,12 +34,12 @@ public class FollowAprilTagOpMode extends OpMode {
 
     @Override
     public void loop() {
-        robot.periodic();
+        drive.periodic();
 
         getAprilTagCenterX().ifPresent((val) -> turnVal = val);
 
         double error = turnVal - 0.5;
-        robot.drive.driveRobotRelative(0, 0, error);
+        drive.driveRobotRelative(0, 0, error);
 
         telemetry.update();
     }
