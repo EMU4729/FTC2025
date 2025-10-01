@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.lib.subsystems.IndexSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.ShooterSubsystem;
 
-@TeleOp(name = "Turret (IAC Demo)")
+@TeleOp(name = "Turret")
 public class TurretOpMode extends OpMode {
     IndexSubsystem index;
     ShooterSubsystem shooter;

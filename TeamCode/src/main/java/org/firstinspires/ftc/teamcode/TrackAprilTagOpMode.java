@@ -12,7 +12,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.Optional;
 
-@TeleOp(name = "Track AprilTag (IAC Demo)")
+@TeleOp(name = "Track AprilTag")
 public class TrackAprilTagOpMode extends OpMode {
     DriveSubsystem drive;
 
