@@ -95,7 +95,7 @@ public class IndexSubsystem extends SubsystemBase {
      * @return the current index of the storage array, such that if the intake takes a ball, the ball colour data should be stored in this index
      */
     private int getStorageIntakeIndex() {
-        return (int) (getCurrentRotation() / ((2 / 3) * Math.PI));
+        return (int) (getCurrentRotation() / ((2.0 / 3.0) * Math.PI));
     }
 
     @Override
