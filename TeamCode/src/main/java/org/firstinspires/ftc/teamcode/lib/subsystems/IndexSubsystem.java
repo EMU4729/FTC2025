@@ -133,7 +133,7 @@ public class IndexSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        detectEnteringBalls();
+//        detectEnteringBalls();
 
         switch (mode) {
             case IDLE:
