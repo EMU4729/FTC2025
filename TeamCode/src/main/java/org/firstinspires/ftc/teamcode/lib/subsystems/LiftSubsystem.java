@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.lib.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -15,6 +16,7 @@ public class LiftSubsystem extends SubsystemBase {
     public LiftSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         leftMotor = hardwareMap.get(DcMotorEx.class, "liftL");
         rightMotor = hardwareMap.get(DcMotorEx.class, "liftR");
+        rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 //        leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //        rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //        leftMotor.setTargetPosition(0);
