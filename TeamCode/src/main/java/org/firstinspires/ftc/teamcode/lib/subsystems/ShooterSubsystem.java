@@ -13,14 +13,12 @@ public class ShooterSubsystem extends SubsystemBase {
     private static final double SHOOTER_PID_I = 0;
     private static final double SHOOTER_PID_D = 0;
 
-    private final DcMotorEx leftMotor;
-    private final DcMotorEx rightMotor;
+    private final DcMotorEx motor;
     private final Servo arcServo;
     private final Servo popServo;
 
     public ShooterSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
-        leftMotor = hardwareMap.get(DcMotorEx.class, "shooterL");
-        rightMotor = hardwareMap.get(DcMotorEx.class, "shooterR");
+        motor = hardwareMap.get(DcMotorEx.class, "shooterL");
         arcServo = hardwareMap.get(Servo.class, "shooterArc");
         popServo = hardwareMap.get(Servo.class, "shooterPop");
 //        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -36,8 +34,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @param arc The position of the arc servo, in the range [0, 1].
      */
     public void shoot(double vel, double arc) {
-        leftMotor.setPower(vel);
-        rightMotor.setPower(vel);
+        motor.setPower(vel);
 //        leftMotor.setVelocity(vel * TICKS_PER_SHOOTER_ROTATION);
 //        rightMotor.setVelocity(vel * TICKS_PER_SHOOTER_ROTATION);
         arcServo.setPosition(arc);
