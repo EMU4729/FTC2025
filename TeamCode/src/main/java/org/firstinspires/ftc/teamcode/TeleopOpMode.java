@@ -17,6 +17,8 @@ public class TeleopOpMode extends OpMode {
     IndexSubsystem index;
     ShooterSubsystem shooter;
 
+    double currentArc = 0.8;
+
     @Override
     public void init() {
         drive = new DriveSubsystem(hardwareMap, telemetry);
@@ -52,12 +54,18 @@ public class TeleopOpMode extends OpMode {
             index.setMode(IndexSubsystem.Mode.IDLE);
         }
 
+        if (gamepad1.right_bumper) {
+            currentArc = Math.min(currentArc + 0.05, 1);
+        } else if (gamepad1.left_bumper) {
+            currentArc = Math.max(currentArc - 0.05, 0);
+        }
+
         if (gamepad1.right_trigger > 0.5) {
             // NOTE: if the shooter is acting weird, the issue is probably in these numbers
             shooter.pop();
-            shooter.shoot(0.8, 0.5);
+            shooter.shoot(0.8, currentArc);
         } else {
-            shooter.shoot(0, 0.5);
+            shooter.shoot(0, currentArc);
             shooter.unpop();
         }
 
