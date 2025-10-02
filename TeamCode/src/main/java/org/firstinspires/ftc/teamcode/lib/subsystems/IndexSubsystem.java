@@ -3,10 +3,10 @@ package org.firstinspires.ftc.teamcode.lib.subsystems;
 import android.graphics.Color;
 
 import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -35,14 +35,14 @@ public class IndexSubsystem extends SubsystemBase {
         EMPTY
     }
 
-    private final Servo servo;
+    private final CRServo servo;
     private final AnalogInput encoder;
     private final NormalizedColorSensor colorSensor;
     private final Ball[] storage = new Ball[]{Ball.EMPTY, Ball.EMPTY, Ball.EMPTY};
     private Mode mode = Mode.IDLE;
 
     public IndexSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
-        servo = hardwareMap.get(Servo.class, "indexServo");
+        servo = hardwareMap.get(CRServo.class, "indexServo");
         encoder = hardwareMap.get(AnalogInput.class, "indexEncoder");
         colorSensor = hardwareMap.get(NormalizedColorSensor.class, "indexColorSensor");
 
@@ -137,13 +137,13 @@ public class IndexSubsystem extends SubsystemBase {
 
         switch (mode) {
             case IDLE:
-                servo.setPosition(0.5);
+                servo.setPower(0);
                 break;
             case CLOCKWISE:
-                servo.setPosition(1);
+                servo.setPower(1);
                 break;
             case ANTICLOCKWISE:
-                servo.setPosition(0);
+                servo.setPower(-1);
                 break;
             // TODO: add logic for the intake and shooting modes
         }
