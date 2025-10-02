@@ -16,11 +16,13 @@ public class ShooterSubsystem extends SubsystemBase {
     private final DcMotorEx leftMotor;
     private final DcMotorEx rightMotor;
     private final Servo arcServo;
+    private final Servo popServo;
 
     public ShooterSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         leftMotor = hardwareMap.get(DcMotorEx.class, "shooterL");
         rightMotor = hardwareMap.get(DcMotorEx.class, "shooterR");
         arcServo = hardwareMap.get(Servo.class, "shooterArc");
+        popServo = hardwareMap.get(Servo.class, "shooterPop");
 //        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        leftMotor.setVelocityPIDFCoefficients(SHOOTER_PID_P, SHOOTER_PID_I, SHOOTER_PID_D, 0);
@@ -39,5 +41,19 @@ public class ShooterSubsystem extends SubsystemBase {
 //        leftMotor.setVelocity(vel * TICKS_PER_SHOOTER_ROTATION);
 //        rightMotor.setVelocity(vel * TICKS_PER_SHOOTER_ROTATION);
         arcServo.setPosition(arc);
+    }
+
+    /**
+     * Pops the ball into the shooter
+     */
+    public void pop() {
+        popServo.setPosition(1);
+    }
+
+    /**
+     * Unpops the ball
+     */
+    public void unpop() {
+        popServo.setPosition(0);
     }
 }
