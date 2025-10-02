@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.lib.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.IndexSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.lib.subsystems.LEDSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.ShooterSubsystem;
 
@@ -16,6 +17,7 @@ public class TeleopOpMode extends OpMode {
     IntakeSubsystem intake;
     IndexSubsystem index;
     ShooterSubsystem shooter;
+    LEDSubsystem led;
 
     double currentArc = 0.8;
 
@@ -26,6 +28,7 @@ public class TeleopOpMode extends OpMode {
         intake = new IntakeSubsystem(hardwareMap, telemetry);
         index = new IndexSubsystem(hardwareMap, telemetry);
         shooter = new ShooterSubsystem(hardwareMap, telemetry);
+        led = new LEDSubsystem(hardwareMap, telemetry);
     }
 
     @Override
@@ -74,6 +77,7 @@ public class TeleopOpMode extends OpMode {
         intake.periodic();
         index.periodic();
         shooter.periodic();
+        led.periodic();
         telemetry.update();
     }
 }
