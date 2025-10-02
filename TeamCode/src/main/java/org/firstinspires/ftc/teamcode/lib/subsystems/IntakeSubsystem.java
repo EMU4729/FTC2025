@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.lib.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -11,11 +12,13 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public IntakeSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         spinMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
+        spinMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         this.telemetry = telemetry;
     }
 
     /**
      * Spin the intake motor for intake
+     *
      * @param power Motor power between [-1, 1]
      */
     public void setPower(double power) {
