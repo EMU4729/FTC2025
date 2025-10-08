@@ -36,9 +36,9 @@ public class TeleopOpMode extends OpMode {
         drive.driveRobotRelative(-gamepad2.left_stick_y, gamepad2.left_stick_x, -gamepad2.right_stick_x);
 
         if (gamepad1.dpad_up) {
-            lift.setPower(0.5);
+            lift.sendLifttoMax();
         } else if (gamepad1.dpad_down) {
-            lift.setPower(-0.5);
+            lift.sendLifttoMinimum();
         } else {
             lift.setPower(0);
         }
@@ -66,7 +66,7 @@ public class TeleopOpMode extends OpMode {
         if (gamepad1.right_trigger > 0.5) {
             // NOTE: if the shooter is acting weird, the issue is probably in these numbers
             shooter.pop();
-            shooter.shoot(0.8, currentArc);
+            shooter.shoot(1, currentArc);
         } else {
             shooter.shoot(0, currentArc);
             shooter.unpop();

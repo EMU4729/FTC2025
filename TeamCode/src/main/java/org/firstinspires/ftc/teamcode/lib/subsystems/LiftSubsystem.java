@@ -13,18 +13,21 @@ public class LiftSubsystem extends SubsystemBase {
     private final DcMotorEx leftMotor;
     private final DcMotorEx rightMotor;
 
+    private double position;
+
     public LiftSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         leftMotor = hardwareMap.get(DcMotorEx.class, "liftL");
         rightMotor = hardwareMap.get(DcMotorEx.class, "liftR");
         rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-//        leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        leftMotor.setTargetPosition(0);
-//        rightMotor.setTargetPosition(0);
-//        leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        leftMotor.setPositionPIDFCoefficients(LIFT_PID_P);
-//        rightMotor.setPositionPIDFCoefficients(LIFT_PID_P);
+       leftMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        rightMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        leftMotor.setTargetPosition(0);
+        rightMotor.setTargetPosition(0);
+        leftMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        rightMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+
+        //leftMotor.setPositionPIDFCoefficients(LIFT_PID_P);
+        //rightMotor.setPositionPIDFCoefficients(LIFT_PID_P);
     }
 
     /**
@@ -36,6 +39,13 @@ public class LiftSubsystem extends SubsystemBase {
         int _pos = (int) (pos / LIFT_DISTANCE_PER_TICK);
         leftMotor.setTargetPosition(_pos);
         rightMotor.setTargetPosition(_pos);
+    }
+    public void sendLifttoMax(){
+        liftGoTo(2500);
+    }
+
+    public void sendLifttoMinimum(){
+        liftGoTo(0);
     }
 
     /**
