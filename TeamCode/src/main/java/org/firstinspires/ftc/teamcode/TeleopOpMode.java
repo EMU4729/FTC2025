@@ -66,11 +66,12 @@ public class TeleopOpMode extends OpMode {
         if (gamepad1.right_trigger > 0.5) {
             // NOTE: if the shooter is acting weird, the issue is probably in these numbers
             shooter.pop();
-            shooter.shoot(0.8, currentArc);
+            shooter.setSpeed(1);
         } else {
-            shooter.shoot(0, currentArc);
+            shooter.setSpeed(0);
             shooter.unpop();
         }
+        shooter.setArc(currentArc);
 
         drive.periodic();
         lift.periodic();
