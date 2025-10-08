@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.lib.subsystems;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -21,22 +22,26 @@ public class ShooterSubsystem extends SubsystemBase {
         motor = hardwareMap.get(DcMotorEx.class, "shooterL");
         arcServo = hardwareMap.get(Servo.class, "shooterArc");
         popServo = hardwareMap.get(Servo.class, "shooterPop");
-//        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        leftMotor.setVelocityPIDFCoefficients(SHOOTER_PID_P, SHOOTER_PID_I, SHOOTER_PID_D, 0);
-//        rightMotor.setVelocityPIDFCoefficients(SHOOTER_PID_P, SHOOTER_PID_I, SHOOTER_PID_D, 0);
+        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motor.setVelocityPIDFCoefficients(SHOOTER_PID_P, SHOOTER_PID_I, SHOOTER_PID_D, 0);
     }
 
     /**
-     * sets left & right motors to a given velocity
+     * sets shooting motor to a given velocity
      *
      * @param vel the target velocity of the shooter in ticks/second
-     * @param arc The position of the arc servo, in the range [0, 1].
      */
-    public void shoot(double vel, double arc) {
-        motor.setPower(vel);
-//        leftMotor.setVelocity(vel * TICKS_PER_SHOOTER_ROTATION);
-//        rightMotor.setVelocity(vel * TICKS_PER_SHOOTER_ROTATION);
+    public void setSpeed(double vel) {
+        // motor.setPower(vel);
+        motor.setVelocity(vel * TICKS_PER_SHOOTER_ROTATION);
+    }
+
+    /**
+     * Sets the position of the arc servo
+     *
+     * @param arc The arc servo's position, in the range [0, 1]
+     */
+    public void setArc(double arc) {
         arcServo.setPosition(arc);
     }
 
