@@ -44,6 +44,10 @@ public class TrackAprilTagOpMode extends OpMode {
         telemetry.update();
     }
 
+    /**
+     * Function gets the x coordinates of an april tag
+     * @return returns the centre x coordinates of april tag if it exists
+     */
     private Optional<Double> getAprilTagCenterX() {
         // currently just tells how many april tags are seen
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
