@@ -98,6 +98,9 @@ public class DriveSubsystem extends SubsystemBase {
         driveRobotRelative(0, 0, 0);
     }
 
+    /**
+     * Updates diagnostic telemetry with power and yaw
+     */
     private void updateTelemetry() {
         telemetry.addData("FL Drive Power", frontLeft.getPower());
         telemetry.addData("FR Drive Power", frontRight.getPower());
