@@ -18,26 +18,27 @@ import java.util.List;
 
 public class LocalisationSubsystem {
     private static final boolean USE_WEBCAM = true;
-    private final SparkFunOTOS OTOSSensor;
+    private static final double OTOS_LINEAR_SCALAR = 1.0; // todo: find exact value, need robot physically
+    private static final double OTOS_ANGULAR_SCALAR = 1.0; // todo: find exact value, need robot physically
+    private static final SparkFunOTOS.Pose2D OTOS_OFFSET = new SparkFunOTOS.Pose2D(0, 0, 0); // todo: find exact values, need robot physically
+
+    private static final Position CAMERA_POSITION = new Position(DistanceUnit.METER,
+            0, 0, 0, 0);
+
+    // pitch was init'd as -90 in demo, but set to 0 here for now (-90 made no sense)
+    private static final YawPitchRollAngles CAMERA_ORIENTATION = new YawPitchRollAngles(AngleUnit.DEGREES,
+            0, -90, 0, 0);
+
+    private final SparkFunOTOS otosSensor;
     private final Telemetry telemetry;
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
     HardwareMap hardwareMap;
 
-
-    // CAMERA Position / YPR
-    private Position cameraPosition = new Position(DistanceUnit.METER,
-            0, 0, 0, 0);
-
-    // pitch was init'd as -90 in demo, but set to 0 here for now (-90 made no sense)
-    private YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
-            0, -90, 0, 0);
-
-
     // ROBOT X, Y and HDG
-    public double robotX;
-    public double robotY;
-    public double robotH;
+    public double robotX = 0.0;
+    public double robotY = 0.0;
+    public double robotH = 0.0;
 
 
 
@@ -47,7 +48,7 @@ public class LocalisationSubsystem {
 
         configureAprilTag();
 
-        OTOSSensor = hardwareMap.get(SparkFunOTOS.class, "sensor_otos");
+        otosSensor = hardwareMap.get(SparkFunOTOS.class, "sensor_otos");
         configureOTOS();
 
         telemetry.addLine("Localisation Subsystem Configured");
@@ -83,17 +84,23 @@ public class LocalisationSubsystem {
         telemetry.update();
     }
 
+    /**
+     * Updates the OTOS sensor to be at the camera's reported position.
+     */
     private void updateOTOS() {
         SparkFunOTOS.Pose2D currentPosition = new SparkFunOTOS.Pose2D(
                 robotX,
                 robotY,
                 robotH
         );
-        OTOSSensor.setPosition(currentPosition);
+        otosSensor.setPosition(currentPosition);
     }
 
+    /**
+     * Updates the robot's position from the OTOS's reported position.
+     */
     private void positionFromOTOS() {
-        SparkFunOTOS.Pose2D currentPosition = OTOSSensor.getPosition();
+        SparkFunOTOS.Pose2D currentPosition = otosSensor.getPosition();
         robotX = currentPosition.x;
         robotY = currentPosition.y;
         robotH = currentPosition.h;
@@ -101,24 +108,23 @@ public class LocalisationSubsystem {
 
     private void configureOTOS() {
         // UNIT CALIBRATION
-        OTOSSensor.setLinearUnit(DistanceUnit.METER);
-        OTOSSensor.setAngularUnit(AngleUnit.DEGREES);
+        otosSensor.setLinearUnit(DistanceUnit.METER);
+        otosSensor.setAngularUnit(AngleUnit.DEGREES);
 
-        // OFFSET ON ROBOT -- todo: find exact values, need robot physically
-        SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(0, 0, 0); // h is for heading, probably
-        OTOSSensor.setOffset(offset);
+        // OFFSET ON ROBOT
+        otosSensor.setOffset(OTOS_OFFSET);
 
-        // SCALAR CALIBRATION -- todo: find exact values, need robot physically
-        OTOSSensor.setLinearScalar(1.0);
-        OTOSSensor.setAngularScalar(1.0);
+        // SCALAR CALIBRATION
+        otosSensor.setLinearScalar(OTOS_LINEAR_SCALAR);
+        otosSensor.setAngularScalar(OTOS_ANGULAR_SCALAR);
 
         // CALIBRATE IMU
-        OTOSSensor.calibrateImu();
-        OTOSSensor.resetTracking();
+        otosSensor.calibrateImu();
+        otosSensor.resetTracking();
 
         // starting position, will be updated by april tag positioning.
         SparkFunOTOS.Pose2D currentPosition = new SparkFunOTOS.Pose2D(0, 0, 0);
-        OTOSSensor.setPosition(currentPosition);
+        otosSensor.setPosition(currentPosition);
 
         telemetry.addLine("OTOS Configured");
         telemetry.update();
@@ -128,7 +134,7 @@ public class LocalisationSubsystem {
     private void configureAprilTag() {
         // april tag processor
         aprilTag = new AprilTagProcessor.Builder()
-                .setCameraPose(cameraPosition, cameraOrientation)
+                .setCameraPose(CAMERA_POSITION, CAMERA_ORIENTATION)
                 .build();
 
         // vision portal
@@ -136,7 +142,7 @@ public class LocalisationSubsystem {
 
         // NOTE: USE_WEBCAM is set at top of class. idk what to set it, so it is currently true as the example code used that.
         if (USE_WEBCAM) {
-            builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
+            builder.setCamera(hardwareMap.get(WebcamName.class, "webcam"));
         } else {
             builder.setCamera(BuiltinCameraDirection.FRONT); // used to be BACK in e.g. code
         }
