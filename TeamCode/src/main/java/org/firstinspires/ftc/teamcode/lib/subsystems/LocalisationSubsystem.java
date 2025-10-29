@@ -18,8 +18,8 @@ import java.util.List;
 
 public class LocalisationSubsystem {
     private static final boolean USE_WEBCAM = true;
-    private SparkFunOTOS OTOSSensor;
-    private Telemetry telemetry;
+    private final SparkFunOTOS OTOSSensor;
+    private final Telemetry telemetry;
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
     HardwareMap hardwareMap;
