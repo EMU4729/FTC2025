@@ -71,7 +71,7 @@ public class TeleopOpMode extends OpMode {
             shooter.setSpeed(0);
             shooter.unpop();
         }
-        shooter.setArc(currentArc);
+        shooter.setYArc(currentArc);
 
         drive.periodic();
         lift.periodic();
