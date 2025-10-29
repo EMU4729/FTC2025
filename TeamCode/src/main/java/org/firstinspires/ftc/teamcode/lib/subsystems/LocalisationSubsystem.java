@@ -40,6 +40,9 @@ public class LocalisationSubsystem {
     public double robotY = 0.0;
     public double robotH = 0.0;
 
+    // STATES
+    public final boolean hasPositionedFromCamera = false; // public, as there can be no turret rotation until the first camera reading has been made, and this var determines this.
+
 
 
     public LocalisationSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
@@ -56,27 +59,30 @@ public class LocalisationSubsystem {
     }
 
     public void periodic() {
-        List<AprilTagDetection> freshDetections = aprilTag.getFreshDetections();
+        if (!hasPositionedFromCamera) {
+            List<AprilTagDetection> freshDetections = aprilTag.getFreshDetections();
 
-        if (!freshDetections.isEmpty()) {
-            // we cannot assume that there is only one detection, but we do know the last one is the latest. therefore, by going through all of them, we can know we are up to date.
-            for (AprilTagDetection detection : freshDetections) {
-                // as shown by demo code - no "Obelisk" tags can be used for positioning
-                if (!detection.metadata.name.contains("Obelisk")) {
-                    robotX = detection.robotPose.getPosition().x;
-                    robotY = detection.robotPose.getPosition().y;
-                    robotH = detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES);
+            if (!freshDetections.isEmpty()) {
+                // we cannot assume that there is only one detection, but we do know the last one is the latest. therefore, by going through all of them, we can know we are up to date.
+                for (AprilTagDetection detection : freshDetections) {
+                    // as shown by demo code - no "Obelisk" tags can be used for positioning
+                    if (!detection.metadata.name.contains("Obelisk")) {
+                        robotX = detection.robotPose.getPosition().x;
+                        robotY = detection.robotPose.getPosition().y;
+                        robotH = detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES);
+                    }
                 }
-            }
 
-            // update the OTOS's position data
-            updateOTOS();
-            telemetry.addData("AprilUpdate", true);
-        } else {
-            // navigate off OTOS
-            positionFromOTOS();
-            telemetry.addData("AprilUpdate", false);
+                // update the OTOS's position data
+                updateOTOS();
+                telemetry.addData("AprilUpdate", true);
+
+                hasPositionedFromCamera = true;
+            }
         }
+
+        positionFromOTOS();
+        telemetry.addData("AprilUpdate", false);
 
         telemetry.addData("RobotX", robotX);
         telemetry.addData("RobotY", robotY);
