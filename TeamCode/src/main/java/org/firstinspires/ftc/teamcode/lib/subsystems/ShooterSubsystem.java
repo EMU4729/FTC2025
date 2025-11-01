@@ -20,7 +20,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private final Servo popServo;
 
     public ShooterSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
-        motor = hardwareMap.get(DcMotorEx.class, "shooterM");
+        motor = hardwareMap.get(DcMotorEx.class, "shooterMotor");
         yServo = hardwareMap.get(Servo.class, "shooterYServo");
         xServo = hardwareMap.get(Servo.class, "shooterXServo");
         popServo = hardwareMap.get(Servo.class, "shooterPop");
@@ -34,8 +34,8 @@ public class ShooterSubsystem extends SubsystemBase {
      * @param vel the target velocity of the shooter in ticks/second
      */
     public void setSpeed(double vel) {
-         motor.setPower(vel);
-//        motor.setVelocity(vel * TICKS_PER_SHOOTER_ROTATION);
+//         motor.setPower(vel);
+        motor.setVelocity(vel * TICKS_PER_SHOOTER_ROTATION);
     }
 
     /**
@@ -43,7 +43,7 @@ public class ShooterSubsystem extends SubsystemBase {
      *
      * @param arc The vertical arc servo's position, in the range [0, 1]
      */
-    public void setYArc(double arc) {
+    public void setY(double arc) {
         yServo.setPosition(arc);
     }
 
@@ -52,7 +52,7 @@ public class ShooterSubsystem extends SubsystemBase {
      *
      * @param arc The horizontal arc servo's position, in the range [0, 1]
      */
-    public void setXArc(double arc){
+    public void setX(double arc) {
         xServo.setPosition(arc);
     }
 
