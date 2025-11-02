@@ -27,12 +27,13 @@ public class TurretOpMode extends OpMode {
             index.setMode(IndexSubsystem.Mode.IDLE);
         }
 
+        shooter.setArc(0.5);
         if (gamepad1.right_trigger > 0.5) {
             // NOTE: if the shooter is acting weird, the issue is probably in these numbers
             shooter.pop();
-            shooter.shoot(0.8, 0.5);
+            shooter.setSpeed(0.8);
         } else {
-            shooter.shoot(0, 0.5);
+            shooter.setSpeed(0);
             shooter.unpop();
         }
 
