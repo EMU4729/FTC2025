@@ -11,6 +11,8 @@ import com.qualcomm.robotcore.hardware.SwitchableLight;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import java.util.function.Function;
+
 public class IndexSubsystem extends SubsystemBase {
     /**
      * The different modes of operation of the indexer
@@ -18,7 +20,9 @@ public class IndexSubsystem extends SubsystemBase {
     public enum Mode {
         IDLE,
         INTAKE,
-        SHOOT,
+        SHOOT_ANY,
+        SHOOT_PURPLE_ONLY,
+        SHOOT_GREEN_ONLY,
         CLOCKWISE,
         ANTICLOCKWISE,
     }
@@ -29,19 +33,26 @@ public class IndexSubsystem extends SubsystemBase {
     private static final float[] GREEN_MIN_HSV = new float[]{0, 0, 0};
     private static final float[] GREEN_MAX_HSV = new float[]{0, 0, 0};
 
+    private static final double[] INTAKE_ROTATIONS = new double[]{0, 0, 0};
+    private static final double[] SHOOT_ROTATIONS = new double[]{0, 0, 0};
+
     private enum Ball {
         GREEN,
         PURPLE,
         EMPTY
     }
 
+    private final Telemetry telemetry;
     private final CRServo servo;
     private final AnalogInput encoder;
     private final NormalizedColorSensor colorSensor;
     private final Ball[] storage = new Ball[]{Ball.EMPTY, Ball.EMPTY, Ball.EMPTY};
     private Mode mode = Mode.IDLE;
+    private double rotation = 0;
+    private boolean atTarget = false;
 
     public IndexSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
+        this.telemetry = telemetry;
         servo = hardwareMap.get(CRServo.class, "indexServo");
         encoder = hardwareMap.get(AnalogInput.class, "indexEncoder");
         colorSensor = hardwareMap.get(NormalizedColorSensor.class, "indexColorSensor");
@@ -97,55 +108,147 @@ public class IndexSubsystem extends SubsystemBase {
     }
 
     /**
+     * Updates the rotation variable with the of the indexer
+     */
+    private void updateRotation() {
+        // the range of the encoder voltage reading is from 0 - 3.3V
+        rotation = encoder.getVoltage() / 3.3 * 2 * Math.PI;
+    }
+
+    /**
      * @return The current rotation of the indexer (rad), in the range [0, 2*Pi) (this number wraps around)
      */
-    public double getCurrentRotation() {
-        return encoder.getVoltage() / 3.3 * 2 * Math.PI;
+    public double getRotation() {
+        // the range of the encoder voltage reading is from 0 - 3.3V
+        return rotation;
     }
 
     /**
-     * @return the current index of the storage array, such that if the intake takes a ball, the ball colour data should be stored in this index
-     */
-    private int getStorageIntakeIndex() {
-        return (int) (getCurrentRotation() / ((2.0 / 3.0) * Math.PI));
-    }
-
-    /**
-     * Sets the indexer to move to the nearest intake slot
+     * Sets the indexer to the given mode.
      */
     public void setMode(Mode newMode) {
         mode = newMode;
     }
 
     /**
-     * detects balls entering the indexer using the color sensor and updates the internal storage array
+     * @return If the indexer is at the target position, if using a "smart" mode.
      */
-    private void detectEnteringBalls() {
-        float[] hsv = getHSV();
-        if (hsvInRange(hsv, PURPLE_MIN_HSV, PURPLE_MAX_HSV)) {
-            int index = getStorageIntakeIndex();
-            storage[index] = Ball.PURPLE;
-        } else if (hsvInRange(hsv, GREEN_MIN_HSV, GREEN_MAX_HSV)) {
-            int index = getStorageIntakeIndex();
-            storage[index] = Ball.GREEN;
+    public boolean atTarget() {
+        // we ignore `atTarget` if we are not in a "smart" mode
+        return (mode == Mode.INTAKE || mode == Mode.SHOOT_ANY || mode == Mode.SHOOT_GREEN_ONLY || mode == Mode.SHOOT_PURPLE_ONLY) && atTarget;
+    }
+
+    /**
+     * Returns the relative angle between two angles, accounting for continuous rotation
+     *
+     * @param a The first angle, in the range [0, 2*Pi]
+     * @param b The second angle, in the range [0, 2*Pi]
+     * @return The wrapped signed angle between a and b
+     */
+    private double wrappedSignedAngleBetween(double a, double b) {
+        double result = a - b;
+        if (result < -Math.PI) result += 2 * Math.PI;
+        else if (result > Math.PI) result -= 2 * Math.PI;
+        return result;
+    }
+
+    /**
+     * Gets the slot index corresponding to the closest rotation matching the predicate
+     *
+     * @param rotations A 3-length array of the rotations corresponding to each indexer slot
+     * @param predicate This function ignores any slots that cause this function to return false
+     * @return The index corresponding to the closest rotation matching the predicate
+     */
+    private int closestSlot(double[] rotations, Function<Integer, Boolean> predicate) {
+        int closestSlotIndex = -1;
+        double minError = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < 3; i++) {
+            if (!predicate.apply(i)) continue;
+            double error = wrappedSignedAngleBetween(rotations[i], rotation);
+            if (Math.abs(error) < Math.abs(minError)) {
+                minError = error;
+                closestSlotIndex = i;
+            }
         }
+
+        return closestSlotIndex;
+    }
+
+    /**
+     * Detects any entering balls and sets them in the storage array with the given index
+     *
+     * @param slotIndex The index to store the detected ball in
+     */
+    private void detectEnteringBalls(int slotIndex) {
+        float[] hsv = getHSV();
+        if (hsvInRange(hsv, GREEN_MIN_HSV, GREEN_MAX_HSV)) {
+            storage[slotIndex] = Ball.GREEN;
+        } else if (hsvInRange(hsv, PURPLE_MIN_HSV, PURPLE_MAX_HSV)) {
+            storage[slotIndex] = Ball.PURPLE;
+        }
+    }
+
+    /**
+     * Publishes some useful data to telemetry.
+     */
+    private void updateTelemetry() {
+        telemetry.addData("Indexer Rotation (deg)", Math.toDegrees(rotation));
+        telemetry.addData("Indexer At Target", atTarget());
+        telemetry.addData("Indexer Mode", mode);
+        telemetry.addData("Indexer Servo Power", servo.getPower());
     }
 
     @Override
     public void periodic() {
-//        detectEnteringBalls();
+        updateRotation();
+        updateTelemetry();
 
         switch (mode) {
             case IDLE:
                 servo.setPower(0);
-                break;
+                return;
             case CLOCKWISE:
                 servo.setPower(1);
-                break;
+                return;
             case ANTICLOCKWISE:
                 servo.setPower(-1);
-                break;
-            // TODO: add logic for the intake and shooting modes
+                return;
         }
+
+        // "smart" mode logic
+
+        double[] rotations = new double[]{0, 0, 0};
+        int closestSlotIndex = -1;
+
+        switch (mode) {
+            case INTAKE:
+                rotations = INTAKE_ROTATIONS;
+                closestSlotIndex = closestSlot(INTAKE_ROTATIONS, (i) -> storage[i] == Ball.EMPTY);
+                detectEnteringBalls(closestSlotIndex);
+                break;
+            case SHOOT_ANY:
+                rotations = SHOOT_ROTATIONS;
+                closestSlotIndex = closestSlot(SHOOT_ROTATIONS, (i) -> storage[i] != Ball.EMPTY);
+                break;
+            case SHOOT_GREEN_ONLY:
+                rotations = SHOOT_ROTATIONS;
+                closestSlotIndex = closestSlot(SHOOT_ROTATIONS, (i) -> storage[i] == Ball.GREEN);
+                break;
+            case SHOOT_PURPLE_ONLY:
+                rotations = SHOOT_ROTATIONS;
+                closestSlotIndex = closestSlot(SHOOT_ROTATIONS, (i) -> storage[i] == Ball.PURPLE);
+                break;
+        }
+
+        if (closestSlotIndex == -1) {
+            // no available closest slot, idle
+            atTarget = false;
+            servo.setPower(0);
+            return;
+        }
+
+        double error = wrappedSignedAngleBetween(rotations[closestSlotIndex], rotation);
+        servo.setPower(error);
+        atTarget = Math.abs(error) < 0.1;
     }
 }
