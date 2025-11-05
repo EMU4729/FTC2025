@@ -26,7 +26,15 @@ public class TeleopOpMode extends OpMode {
         SHOOTING
     }
 
+    // put the comment for method again (I forgot)
+    private enum IntakeState {
+        IDLE,
+        READY,
+        PULL
+    }
+
     private ShootState shootState = ShootState.IDLE;
+    private IntakeState intakeState = IntakeState.IDLE;
     ElapsedTime timer;
     private double shootTime = 0;
 
@@ -61,6 +69,37 @@ public class TeleopOpMode extends OpMode {
     public void loop() {
         drive.driveRobotRelative(-gamepad2.left_stick_y, gamepad2.left_stick_x, -gamepad2.right_stick_x);
 
+        // intake FSM
+        if (gamepad2.left_trigger > 0.5 && intakeState == IntakeState.IDLE) {
+             intakeState = IntakeState.READY;
+        } else if (gamepad2.left_trigger <= 0.5) {
+            intakeState = IntakeState.IDLE;
+        }
+
+        switch (intakeState) {
+            case IDLE:
+                // Reset everything
+                intake.setPower(0);
+                break;
+
+            case READY:
+                // primes the indexer
+                index.setMode(IndexSubsystem.Mode.INTAKE);
+                intake.setPower(0);
+                if (index.atTarget()) {
+                    intakeState = IntakeState.PULL;
+                }
+                break;
+
+            case PULL:
+                // Pulls the ball in
+                intake.setPower(1);
+                if (index.ballIntaken()) {
+                    intakeState = IntakeState.READY; // IDLE
+                }
+                break;
+        }
+
         if (gamepad2.right_trigger > 0.5 && shootState == ShootState.IDLE) {
             shootState = ShootState.PREPARING;
         } else if (gamepad2.right_trigger <= 0.5) {
@@ -90,7 +129,6 @@ public class TeleopOpMode extends OpMode {
                 }
                 break;
         }
-
 
         drive.periodic();
         lift.periodic();

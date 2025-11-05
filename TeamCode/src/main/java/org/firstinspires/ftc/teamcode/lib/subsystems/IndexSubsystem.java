@@ -50,6 +50,7 @@ public class IndexSubsystem extends SubsystemBase {
     private Mode mode = Mode.IDLE;
     private double rotation = 0;
     private boolean atTarget = false;
+    private boolean ballRecentlyIntaken = false;
 
     public IndexSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
@@ -139,6 +140,18 @@ public class IndexSubsystem extends SubsystemBase {
     }
 
     /**
+     * Resets var ballRecentlyIntaken to false
+     * @return true if ball is intaken recently or false if not
+     */
+    public boolean ballIntaken() {
+        if (ballRecentlyIntaken) {
+            ballRecentlyIntaken = false;
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Returns the relative angle between two angles, accounting for continuous rotation
      *
      * @param a The first angle, in the range [0, 2*Pi]
@@ -183,8 +196,10 @@ public class IndexSubsystem extends SubsystemBase {
         float[] hsv = getHSV();
         if (hsvInRange(hsv, GREEN_MIN_HSV, GREEN_MAX_HSV)) {
             storage[slotIndex] = Ball.GREEN;
+            ballRecentlyIntaken = true;
         } else if (hsvInRange(hsv, PURPLE_MIN_HSV, PURPLE_MAX_HSV)) {
             storage[slotIndex] = Ball.PURPLE;
+            ballRecentlyIntaken = true;
         }
     }
 
