@@ -17,6 +17,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private final DcMotorEx motor;
     private final Servo arcServo;
     private final Servo popServo;
+    private double vel = 0;
 
     public ShooterSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         motor = hardwareMap.get(DcMotorEx.class, "shooterL");
@@ -34,6 +35,15 @@ public class ShooterSubsystem extends SubsystemBase {
     public void setSpeed(double vel) {
         // motor.setPower(vel);
         motor.setVelocity(vel * TICKS_PER_SHOOTER_ROTATION);
+        this.vel = vel;
+    }
+
+    public double getMotorSpeed() {
+        return motor.getVelocity() / TICKS_PER_SHOOTER_ROTATION;
+    }
+
+    public boolean atDesiredSpeed() {
+        return Math.abs(vel - getMotorSpeed()) < 0.1;
     }
 
     /**
