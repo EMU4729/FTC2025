@@ -21,7 +21,7 @@ public class TeleopOpMode extends OpMode {
 
     private enum ShooterStates {
         IDLE,
-        PREPING,
+        PREPARING,
         SHOOTING
     }
 
