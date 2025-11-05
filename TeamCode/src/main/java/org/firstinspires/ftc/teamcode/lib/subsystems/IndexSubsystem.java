@@ -198,6 +198,14 @@ public class IndexSubsystem extends SubsystemBase {
         telemetry.addData("Indexer Servo Power", servo.getPower());
     }
 
+    /**
+     * Empty the current slot (from the perspective of the shooter).
+     */
+    public void emptyCurrentSlot() {
+        int closestSlotIndex = closestSlot(SHOOT_ROTATIONS, (i) -> storage[i] != Ball.EMPTY);
+        storage[closestSlotIndex] = Ball.EMPTY;
+    }
+
     @Override
     public void periodic() {
         updateRotation();
