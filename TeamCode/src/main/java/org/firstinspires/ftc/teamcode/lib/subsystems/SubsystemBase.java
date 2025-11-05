@@ -9,5 +9,6 @@ public abstract class SubsystemBase {
      * continuously, such as updating telemetry, or PID controllers.
      */
     public void periodic() {
+
     }
 }
