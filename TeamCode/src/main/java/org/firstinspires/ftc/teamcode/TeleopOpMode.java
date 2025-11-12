@@ -30,13 +30,34 @@ public class TeleopOpMode extends OpMode {
     private enum IntakeState {
         IDLE,
         READY,
-        PULL
+        PULL,
+    }
+
+
+    private enum TiltShooter {
+        IDLE,
+        UP,
+        DOWN,
+        fUP, // f stands for fine movements
+        fDOWN
+    }
+
+    private enum BallColour{
+        ANY,
+        PURPLE,
+        GREEN
     }
 
     private ShootState shootState = ShootState.IDLE;
     private IntakeState intakeState = IntakeState.IDLE;
+    private BallColour ballColour = BallColour.ANY;
+    private TiltShooter tiltShooter = TiltShooter.IDLE;
+
     ElapsedTime timer;
     private double shootTime = 0;
+
+    private double currentArc = 0;
+
 
     @Override
     public void init() {
@@ -69,6 +90,18 @@ public class TeleopOpMode extends OpMode {
     public void loop() {
         drive.driveRobotRelative(-gamepad2.left_stick_y, gamepad2.left_stick_x, -gamepad2.right_stick_x);
 
+        // select colour conditional statements (NO FSM)
+        if (gamepad2.a) {
+            ballColour = BallColour.GREEN;
+            telemetry.addData("Current Ball", "GREEN");
+        } else if (gamepad2.x) {
+            ballColour = BallColour.PURPLE;
+            telemetry.addData("Current Ball", "PURPLE");
+        } else if (gamepad2.y) {
+            ballColour = BallColour.ANY;
+            telemetry.addData("Current Ball", "ANY");
+        }
+
         // intake FSM
         if (gamepad2.left_trigger > 0.5 && intakeState == IntakeState.IDLE) {
              intakeState = IntakeState.READY;
@@ -100,6 +133,15 @@ public class TeleopOpMode extends OpMode {
                 break;
         }
 
+        // Shooter TILT FSM
+        if (gamepad2.dpad_up) {
+            currentArc += 5;
+        } else if (gamepad2.dpad_down) {
+            currentArc -= 5;
+        }
+        shooter.setArc(currentArc);
+
+        // Shoot state FSM
         if (gamepad2.right_trigger > 0.5 && shootState == ShootState.IDLE) {
             shootState = ShootState.PREPARING;
         } else if (gamepad2.right_trigger <= 0.5) {
@@ -113,7 +155,16 @@ public class TeleopOpMode extends OpMode {
                 shooter.unpop();
                 break;
             case PREPARING:
-                index.setMode(IndexSubsystem.Mode.SHOOT_ANY);
+                //index.setMode(IndexSubsystem.Mode.SHOOT_ANY);
+                if (ballColour == BallColour.GREEN){
+                    index.setMode(IndexSubsystem.Mode.SHOOT_GREEN_ONLY);
+                } else if (ballColour == BallColour.PURPLE){
+                    index.setMode(IndexSubsystem.Mode.SHOOT_PURPLE_ONLY);
+                }else if (ballColour == BallColour.ANY){
+                    index.setMode(IndexSubsystem.Mode.SHOOT_ANY);
+                }else{ // failsafe
+                    index.setMode(IndexSubsystem.Mode.SHOOT_ANY);
+                }
                 shooter.setSpeed(getCorrectShooterSpeed(gamepad2.y));
                 if (index.atTarget() && shooter.atDesiredSpeed()) {
                     shootState = ShootState.SHOOTING;
@@ -123,6 +174,9 @@ public class TeleopOpMode extends OpMode {
             case SHOOTING:
                 shooter.pop();
                 index.emptyCurrentSlot();
+
+                ballColour = BallColour.ANY;
+
                 if (timer.time() - shootTime > 0.5) {
                     shooter.unpop();
                     shootState = ShootState.PREPARING;
