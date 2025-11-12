@@ -34,14 +34,6 @@ public class TeleopOpMode extends OpMode {
     }
 
 
-    private enum TiltShooter {
-        IDLE,
-        UP,
-        DOWN,
-        fUP, // f stands for fine movements
-        fDOWN
-    }
-
     private enum BallColour{
         ANY,
         PURPLE,
@@ -51,8 +43,6 @@ public class TeleopOpMode extends OpMode {
     private ShootState shootState = ShootState.IDLE;
     private IntakeState intakeState = IntakeState.IDLE;
     private BallColour ballColour = BallColour.ANY;
-    private TiltShooter tiltShooter = TiltShooter.IDLE;
-
     ElapsedTime timer;
     private double shootTime = 0;
 
@@ -90,7 +80,7 @@ public class TeleopOpMode extends OpMode {
     public void loop() {
         drive.driveRobotRelative(-gamepad2.left_stick_y, gamepad2.left_stick_x, -gamepad2.right_stick_x);
 
-        // select colour conditional statements (NO FSM)
+        // select colour conditional statements
         if (gamepad2.a) {
             ballColour = BallColour.GREEN;
             telemetry.addData("Current Ball", "GREEN");
@@ -155,7 +145,6 @@ public class TeleopOpMode extends OpMode {
                 shooter.unpop();
                 break;
             case PREPARING:
-                //index.setMode(IndexSubsystem.Mode.SHOOT_ANY);
                 if (ballColour == BallColour.GREEN){
                     index.setMode(IndexSubsystem.Mode.SHOOT_GREEN_ONLY);
                 } else if (ballColour == BallColour.PURPLE){
@@ -165,6 +154,7 @@ public class TeleopOpMode extends OpMode {
                 }else{ // failsafe
                     index.setMode(IndexSubsystem.Mode.SHOOT_ANY);
                 }
+
                 shooter.setSpeed(getCorrectShooterSpeed(gamepad2.y));
                 if (index.atTarget() && shooter.atDesiredSpeed()) {
                     shootState = ShootState.SHOOTING;
