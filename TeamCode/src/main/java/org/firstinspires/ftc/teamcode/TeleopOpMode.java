@@ -132,7 +132,6 @@ public class TeleopOpMode extends OpMode {
 
         switch (shootState) {
             case IDLE:
-                index.setMode(IndexSubsystem.Mode.IDLE);
                 shooter.setSpeed(0);
                 shooter.unpop();
                 break;
