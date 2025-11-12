@@ -115,7 +115,7 @@ public class TeleopOpMode extends OpMode {
                 break;
         }
 
-        // Shooter TILT FSM
+        // Shooter arc control
         if (gamepad2.dpad_up) {
             currentArc += 5;
         } else if (gamepad2.dpad_down) {
