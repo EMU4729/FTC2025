@@ -33,21 +33,12 @@ public class TeleopOpMode extends OpMode {
         PULL,
     }
 
-
-    private enum BallColour{
-        ANY,
-        PURPLE,
-        GREEN
-    }
-
     private ShootState shootState = ShootState.IDLE;
     private IntakeState intakeState = IntakeState.IDLE;
-    private BallColour ballColour = BallColour.ANY;
-    ElapsedTime timer;
+    private IndexSubsystem.Mode shootMode = IndexSubsystem.Mode.SHOOT_ANY;
+    private ElapsedTime timer;
     private double shootTime = 0;
-
     private double currentArc = 0;
-
 
     @Override
     public void init() {
@@ -66,6 +57,7 @@ public class TeleopOpMode extends OpMode {
 
     /**
      * Get the speed the shooter should be at to fire based off the speed setting modes.
+     *
      * @return A double of the motor speed that the motor should be at to fire.
      */
     private double getCorrectShooterSpeed(boolean slow) {
@@ -82,19 +74,19 @@ public class TeleopOpMode extends OpMode {
 
         // select colour conditional statements
         if (gamepad2.a) {
-            ballColour = BallColour.GREEN;
+            shootMode = IndexSubsystem.Mode.SHOOT_GREEN_ONLY;
             telemetry.addData("Current Ball", "GREEN");
         } else if (gamepad2.x) {
-            ballColour = BallColour.PURPLE;
+            shootMode = IndexSubsystem.Mode.SHOOT_PURPLE_ONLY;
             telemetry.addData("Current Ball", "PURPLE");
         } else if (gamepad2.y) {
-            ballColour = BallColour.ANY;
+            shootMode = IndexSubsystem.Mode.SHOOT_ANY;
             telemetry.addData("Current Ball", "ANY");
         }
 
         // intake FSM
         if (gamepad2.left_trigger > 0.5 && intakeState == IntakeState.IDLE) {
-             intakeState = IntakeState.READY;
+            intakeState = IntakeState.READY;
         } else if (gamepad2.left_trigger <= 0.5) {
             intakeState = IntakeState.IDLE;
         }
@@ -118,7 +110,7 @@ public class TeleopOpMode extends OpMode {
                 // Pulls the ball in
                 intake.setPower(1);
                 if (index.ballIntaken()) {
-                    intakeState = IntakeState.READY; // IDLE
+                    intakeState = IntakeState.READY;
                 }
                 break;
         }
@@ -144,28 +136,21 @@ public class TeleopOpMode extends OpMode {
                 shooter.setSpeed(0);
                 shooter.unpop();
                 break;
-            case PREPARING:
-                if (ballColour == BallColour.GREEN){
-                    index.setMode(IndexSubsystem.Mode.SHOOT_GREEN_ONLY);
-                } else if (ballColour == BallColour.PURPLE){
-                    index.setMode(IndexSubsystem.Mode.SHOOT_PURPLE_ONLY);
-                }else if (ballColour == BallColour.ANY){
-                    index.setMode(IndexSubsystem.Mode.SHOOT_ANY);
-                }else{ // failsafe
-                    index.setMode(IndexSubsystem.Mode.SHOOT_ANY);
-                }
 
+            case PREPARING:
+                index.setMode(shootMode);
                 shooter.setSpeed(getCorrectShooterSpeed(gamepad2.y));
                 if (index.atTarget() && shooter.atDesiredSpeed()) {
                     shootState = ShootState.SHOOTING;
                     shootTime = timer.time();
                 }
                 break;
+
             case SHOOTING:
                 shooter.pop();
                 index.emptyCurrentSlot();
 
-                ballColour = BallColour.ANY;
+                shootMode = IndexSubsystem.Mode.SHOOT_ANY;
 
                 if (timer.time() - shootTime > 0.5) {
                     shooter.unpop();
