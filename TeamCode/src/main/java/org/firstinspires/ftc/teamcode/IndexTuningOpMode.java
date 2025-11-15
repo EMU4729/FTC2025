@@ -5,10 +5,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.lib.subsystems.IndexSubsystem;
 
-@TeleOp(name = "Tune Index Color Sensor HSV Bounds")
-public class IndexHSVBoundsTuningOpMode extends OpMode {
+@TeleOp(name = "Index Tuning")
+public class IndexTuningOpMode extends OpMode {
     private static final float HUE_STEP = 1f;
     private static final float OTHER_STEP = 0.05f;
+    private static final float GAIN_STEP = 0.05f;
     private static final String[] VALUE_LABELS = {
             "Upper Hue",
             "Upper Saturation",
@@ -28,6 +29,7 @@ public class IndexHSVBoundsTuningOpMode extends OpMode {
 
     @Override
     public void loop() {
+        // editing bounds value -> up and down dpad
         if (gamepad1.dpadUpWasPressed()) {
             if (currentValue == 0 || currentValue == 3) {
                 values[currentValue] += HUE_STEP;
@@ -40,10 +42,29 @@ public class IndexHSVBoundsTuningOpMode extends OpMode {
             } else {
                 values[currentValue] -= OTHER_STEP;
             }
-        } else if (gamepad1.dpadLeftWasPressed()) {
+        }
+
+        // changing bounds value being edited -> left and right dpad
+        if (gamepad1.dpadLeftWasPressed()) {
             currentValue = (currentValue - 1) % 6;
         } else if (gamepad1.dpadRightWasPressed()) {
             currentValue = (currentValue + 1) % 6;
+        }
+
+        // indexer rotation -> left stick x
+        if (gamepad1.left_stick_x > 0.1) {
+            index.setMode(IndexSubsystem.Mode.CLOCKWISE);
+        } else if (gamepad1.left_stick_x < -0.1) {
+            index.setMode(IndexSubsystem.Mode.ANTICLOCKWISE);
+        } else {
+            index.setMode(IndexSubsystem.Mode.IDLE);
+        }
+
+        // gain adjustment -> left and right bumper
+        if (gamepad1.rightBumperWasPressed()) {
+            index.setGain(index.getGain() + GAIN_STEP);
+        } else if (gamepad1.leftBumperWasPressed()) {
+            index.setGain(index.getGain() - GAIN_STEP);
         }
 
         float[] lower = new float[]{values[0], values[1], values[2]};
@@ -53,7 +74,9 @@ public class IndexHSVBoundsTuningOpMode extends OpMode {
         telemetry.addData("HSV Upper Bound", upper);
         telemetry.addData("HSV Lower Bound", lower);
         telemetry.addData("Current HSV", index.getHSV());
+        telemetry.addData("Current Gain", index.getGain());
         telemetry.addData("In Bounds?", IndexSubsystem.hsvInRange(index.getHSV(), lower, upper));
+        index.periodic();
         telemetry.update();
     }
 }
