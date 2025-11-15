@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -75,12 +77,15 @@ public class TeleopOpMode extends OpMode {
         // select colour conditional statements
         if (gamepad2.a) {
             shootMode = IndexSubsystem.Mode.SHOOT_GREEN_ONLY;
+            led.setSolidColor(Color.GREEN);
             telemetry.addData("Current Ball", "GREEN");
         } else if (gamepad2.x) {
             shootMode = IndexSubsystem.Mode.SHOOT_PURPLE_ONLY;
+            led.setSolidColor(Color.rgb(128, 0, 128)); // purple
             telemetry.addData("Current Ball", "PURPLE");
         } else if (gamepad2.y) {
             shootMode = IndexSubsystem.Mode.SHOOT_ANY;
+            led.setMode(LEDSubsystem.Mode.RAINBOW);
             telemetry.addData("Current Ball", "ANY");
         }
 
