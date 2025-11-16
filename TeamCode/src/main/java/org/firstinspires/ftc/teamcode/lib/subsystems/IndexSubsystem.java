@@ -36,7 +36,7 @@ public class IndexSubsystem extends SubsystemBase {
     private static final double[] INTAKE_ROTATIONS = new double[]{0, 0, 0};
     private static final double[] SHOOT_ROTATIONS = new double[]{0, 0, 0};
 
-    private enum Ball {
+    public enum Ball {
         GREEN,
         PURPLE,
         EMPTY
@@ -141,6 +141,7 @@ public class IndexSubsystem extends SubsystemBase {
 
     /**
      * Resets var ballRecentlyIntaken to false
+     *
      * @return true if ball is intaken recently or false if not
      */
     public boolean ballIntaken() {
