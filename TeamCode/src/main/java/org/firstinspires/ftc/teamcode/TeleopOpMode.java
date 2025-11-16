@@ -138,12 +138,11 @@ public class TeleopOpMode extends OpMode {
 
             case SHOOTING:
                 shooter.pop();
-                index.emptyCurrentSlot();
-
                 shootMode = IndexSubsystem.Mode.SHOOT_ANY;
 
                 if (timer.time() - shootTime > 0.5) {
                     shooter.unpop();
+                    index.emptyCurrentSlot();
                     shootState = ShootState.PREPARING;
                 }
                 break;
