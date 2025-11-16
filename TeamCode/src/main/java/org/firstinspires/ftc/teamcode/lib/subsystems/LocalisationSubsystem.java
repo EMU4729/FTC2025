@@ -68,6 +68,9 @@ public class LocalisationSubsystem {
         otosSensor.setPosition(robotPose);
     }
 
+    /**
+     * @return true if the robot's pose has been initialised from a detected AprilTag, false if not
+     */
     public boolean isInitialised() {
         return initialised;
     }
