@@ -37,7 +37,7 @@ public class TeleopOpMode extends OpMode {
     private ShootState shootState = ShootState.IDLE;
     private IntakeState intakeState = IntakeState.IDLE;
     private IndexSubsystem.Mode shootMode = IndexSubsystem.Mode.SHOOT_ANY;
-    private ElapsedTime timer = new ElapsedTime();
+    private final ElapsedTime timer = new ElapsedTime();
     private double shootTime = 0;
     private double currentArc = 0;
 
