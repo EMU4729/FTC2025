@@ -67,6 +67,19 @@ public class IndexSubsystem extends SubsystemBase {
     }
 
     /**
+     * Overwrites the internal indexer storage array. USE WITH CAUTION - THIS CAN EASILY BREAK THINGS.
+     *
+     * @param first  The ball in the first slot
+     * @param second The ball in the second slot
+     * @param third  The ball in the third slot.
+     */
+    public void setStorage(Ball first, Ball second, Ball third) {
+        storage[0] = first;
+        storage[1] = second;
+        storage[2] = third;
+    }
+
+    /**
      * Checks if the given HSV values is in a specified range.
      *
      * @param hsv The HSV color to check.
