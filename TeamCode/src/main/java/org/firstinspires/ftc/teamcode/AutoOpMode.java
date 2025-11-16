@@ -68,5 +68,11 @@ public class AutoOpMode extends OpMode {
                 }
                 break;
         }
+
+        drive.periodic();
+        index.periodic();
+        shooter.periodic();
+        localisation.periodic();
+        telemetry.update();
     }
 }
