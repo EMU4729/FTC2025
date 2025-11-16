@@ -1,16 +1,12 @@
 package org.firstinspires.ftc.teamcode.lib.subsystems;
 
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class DriveSubsystem extends SubsystemBase {
-    private final IMU imu;
     private final DcMotor frontLeft;
     private final DcMotor frontRight;
     private final DcMotor rearLeft;
@@ -27,15 +23,6 @@ public class DriveSubsystem extends SubsystemBase {
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
         rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         rearRight.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        imu = hardwareMap.get(IMU.class, "imu");
-        final IMU.Parameters params = new IMU.Parameters(
-                new RevHubOrientationOnRobot(
-                        RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                        RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
-                )
-        );
-        imu.initialize(params);
 
         this.telemetry = telemetry;
     }
@@ -79,13 +66,14 @@ public class DriveSubsystem extends SubsystemBase {
     /**
      * Drives the robot with field-relative speeds.
      *
-     * @param x Field-relative x speed in the range [-1, 1].
-     * @param y Field-relative y speed in the range [-1, 1].
-     * @param r Rotational speed in the range [-1, 1].
+     * @param x        Field-relative x speed in the range [-1, 1].
+     * @param y        Field-relative y speed in the range [-1, 1].
+     * @param r        Rotational speed in the range [-1, 1].
+     * @param robotYaw The current yaw of the robot, in radians
      */
-    public void driveFieldRelative(double x, double y, double r) {
+    public void driveFieldRelative(double x, double y, double r, double robotYaw) {
         // https://en.wikipedia.org/wiki/Rotation_matrix
-        double offset = -imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        double offset = -robotYaw;
         double robotRelativeY = x * Math.cos(offset) + y * Math.sin(offset);
         double robotRelativeX = -x * Math.sin(offset) + y * Math.cos(offset);
         driveRobotRelative(robotRelativeX, robotRelativeY, r);
@@ -106,6 +94,5 @@ public class DriveSubsystem extends SubsystemBase {
         telemetry.addData("FR Drive Power", frontRight.getPower());
         telemetry.addData("BL Drive Power", rearLeft.getPower());
         telemetry.addData("BR Drive Power", rearRight.getPower());
-        telemetry.addData("Robot Yaw", imu.getRobotYawPitchRollAngles().getYaw());
     }
 }

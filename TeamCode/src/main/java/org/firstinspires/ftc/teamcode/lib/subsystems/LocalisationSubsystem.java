@@ -37,7 +37,7 @@ public class LocalisationSubsystem {
     private final AprilTagProcessor aprilTag;
     private final VisionPortal visionPortal;
     private SparkFunOTOS.Pose2D robotPose = new SparkFunOTOS.Pose2D();
-    private boolean hasPositionedFromCamera = false;
+    private boolean initialised = false;
     private int obeliskId = -1;
 
     public LocalisationSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
@@ -68,6 +68,10 @@ public class LocalisationSubsystem {
         otosSensor.setPosition(robotPose);
     }
 
+    public boolean isInitialised() {
+        return initialised;
+    }
+
     /**
      * @return The current pose of the robot.
      */
@@ -84,7 +88,7 @@ public class LocalisationSubsystem {
     }
 
     private void updateTelemetry() {
-        telemetry.addData("AprilTag Positioning Complete", hasPositionedFromCamera);
+        telemetry.addData("AprilTag Positioning Complete", initialised);
         telemetry.addData("Robot X", robotPose.x);
         telemetry.addData("Robot Y", robotPose.y);
         telemetry.addData("Robot Heading (deg)", Math.toDegrees(robotPose.h));
@@ -93,7 +97,7 @@ public class LocalisationSubsystem {
     public void periodic() {
         updateTelemetry();
 
-        if (!hasPositionedFromCamera) {
+        if (!initialised) {
             List<AprilTagDetection> freshDetections = aprilTag.getFreshDetections();
 
             if (freshDetections.isEmpty()) return;
@@ -110,11 +114,11 @@ public class LocalisationSubsystem {
                         detection.robotPose.getPosition().y,
                         detection.robotPose.getOrientation().getYaw(AngleUnit.RADIANS)
                 );
-                hasPositionedFromCamera = true;
+                initialised = true;
             }
 
             // only update otos position if a non-obelisk apriltag was detected
-            if (hasPositionedFromCamera) otosSensor.setPosition(robotPose);
+            if (initialised) otosSensor.setPosition(robotPose);
         }
 
         robotPose = otosSensor.getPosition();
