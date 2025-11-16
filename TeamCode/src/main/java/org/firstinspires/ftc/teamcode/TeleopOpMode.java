@@ -28,7 +28,6 @@ public class TeleopOpMode extends OpMode {
         SHOOTING
     }
 
-    // put the comment for method again (I forgot)
     private enum IntakeState {
         IDLE,
         READY,
@@ -38,7 +37,7 @@ public class TeleopOpMode extends OpMode {
     private ShootState shootState = ShootState.IDLE;
     private IntakeState intakeState = IntakeState.IDLE;
     private IndexSubsystem.Mode shootMode = IndexSubsystem.Mode.SHOOT_ANY;
-    private ElapsedTime timer;
+    private ElapsedTime timer = new ElapsedTime();
     private double shootTime = 0;
     private double currentArc = 0;
 
@@ -55,19 +54,6 @@ public class TeleopOpMode extends OpMode {
     @Override
     public void start() {
         timer.reset();
-    }
-
-    /**
-     * Get the speed the shooter should be at to fire based off the speed setting modes.
-     *
-     * @return A double of the motor speed that the motor should be at to fire.
-     */
-    private double getCorrectShooterSpeed(boolean slow) {
-        if (!slow) {
-            return 2;
-        } else {
-            return 0.5;
-        }
     }
 
     @Override
@@ -143,7 +129,7 @@ public class TeleopOpMode extends OpMode {
 
             case PREPARING:
                 index.setMode(shootMode);
-                shooter.setSpeed(getCorrectShooterSpeed(gamepad2.y));
+                shooter.setSpeed(gamepad2.y ? 0.5 : 2);
                 if (index.atTarget() && shooter.atDesiredSpeed()) {
                     shootState = ShootState.SHOOTING;
                     shootTime = timer.time();
