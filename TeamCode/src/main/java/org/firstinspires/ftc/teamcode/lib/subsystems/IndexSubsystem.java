@@ -47,13 +47,19 @@ public class IndexSubsystem extends SubsystemBase {
     private final AnalogInput encoder;
     private final NormalizedColorSensor colorSensor;
     private final Ball[] storage = new Ball[]{Ball.EMPTY, Ball.EMPTY, Ball.EMPTY};
+    private final boolean disableColorSensor;
     private Mode mode = Mode.IDLE;
     private double rotation = 0;
     private boolean atTarget = false;
     private boolean ballRecentlyIntaken = false;
 
     public IndexSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
+        this(hardwareMap, telemetry, false);
+    }
+
+    public IndexSubsystem(HardwareMap hardwareMap, Telemetry telemetry, boolean disableColorSensor) {
         this.telemetry = telemetry;
+        this.disableColorSensor = disableColorSensor;
         servo = hardwareMap.get(CRServo.class, "indexServo");
         encoder = hardwareMap.get(AnalogInput.class, "indexEncoder");
         colorSensor = hardwareMap.get(NormalizedColorSensor.class, "indexColorSensor");
@@ -202,11 +208,22 @@ public class IndexSubsystem extends SubsystemBase {
     }
 
     /**
+     * This function updates the internal storage array to have a green ball in the closest intake
+     * position. THIS IS DANGEROUS, DO NOT USE UNLESS YOU KNOW WHAT YOU'RE DOING.
+     */
+    public void unsafe_manuallyMarkIntake() {
+        int closestSlotIndex = closestSlot(INTAKE_ROTATIONS, (i) -> storage[i] == Ball.EMPTY);
+        storage[closestSlotIndex] = Ball.GREEN;
+        ballRecentlyIntaken = true;
+    }
+
+    /**
      * Detects any entering balls and sets them in the storage array with the given index
      *
      * @param slotIndex The index to store the detected ball in
      */
     private void detectEnteringBalls(int slotIndex) {
+        if (disableColorSensor) return;
         float[] hsv = getHSV();
         if (hsvInRange(hsv, GREEN_MIN_HSV, GREEN_MAX_HSV)) {
             storage[slotIndex] = Ball.GREEN;
