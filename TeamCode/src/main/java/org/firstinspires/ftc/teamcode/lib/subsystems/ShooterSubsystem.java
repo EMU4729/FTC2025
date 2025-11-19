@@ -8,11 +8,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class ShooterSubsystem extends SubsystemBase {
-    // TODO: tune these!
-    private static final double TICKS_PER_SHOOTER_ROTATION = 1;
-    private static final double SHOOTER_PID_P = 0;
-    private static final double SHOOTER_PID_I = 0;
-    private static final double SHOOTER_PID_D = 0;
+    private static final double TICKS_PER_SHOOTER_ROTATION = 1; // TODO: change
+    private static final double SHOOTER_PID_P = 0; // TODO: tune
+    private static final double SHOOTER_PID_I = 0; // TODO: tune
+    private static final double SHOOTER_PID_D = 0; // TODO: tune
 
     private final DcMotorEx motor;
     private final Servo arcServo;

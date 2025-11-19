@@ -20,8 +20,8 @@ public class LocalisationSubsystem {
     private static final double OTOS_LINEAR_SCALAR = 1.0; // todo: find exact value, need robot physically
     private static final double OTOS_ANGULAR_SCALAR = 1.0; // todo: find exact value, need robot physically
     private static final SparkFunOTOS.Pose2D OTOS_OFFSET = new SparkFunOTOS.Pose2D(0, 0, 0); // todo: find exact values, need robot physically
-    private static final Position CAMERA_POSITION = new Position(DistanceUnit.METER,
-            0, 0, 0, 0);
+    private static final Position CAMERA_POSITION = new Position(
+            DistanceUnit.METER, 0, 0, 0, 0); // TODO: find exact values, need robot physically
 
     // pitch was init'd as -90 in demo, but set to 0 here for now (-90 made no sense)
     private static final YawPitchRollAngles CAMERA_ORIENTATION = new YawPitchRollAngles(AngleUnit.DEGREES,

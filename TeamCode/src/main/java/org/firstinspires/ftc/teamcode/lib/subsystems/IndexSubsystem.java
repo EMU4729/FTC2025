@@ -27,14 +27,14 @@ public class IndexSubsystem extends SubsystemBase {
         ANTICLOCKWISE,
     }
 
-    private static final float COLOR_SENSOR_GAIN = 1;
-    private static final float[] PURPLE_MIN_HSV = new float[]{0, 0, 0};
-    private static final float[] PURPLE_MAX_HSV = new float[]{0, 0, 0};
-    private static final float[] GREEN_MIN_HSV = new float[]{0, 0, 0};
-    private static final float[] GREEN_MAX_HSV = new float[]{0, 0, 0};
+    private static final float COLOR_SENSOR_GAIN = 1; // TODO: tune
+    private static final float[] PURPLE_MIN_HSV = new float[]{0, 0, 0}; // TODO: tune
+    private static final float[] PURPLE_MAX_HSV = new float[]{0, 0, 0}; // TODO: tune
+    private static final float[] GREEN_MIN_HSV = new float[]{0, 0, 0}; // TODO: tune
+    private static final float[] GREEN_MAX_HSV = new float[]{0, 0, 0}; // TODO: tune
 
-    private static final double[] INTAKE_ROTATIONS = new double[]{0, 0, 0};
-    private static final double[] SHOOT_ROTATIONS = new double[]{0, 0, 0};
+    private static final double[] INTAKE_ROTATIONS = new double[]{0, 0, 0}; // TODO: tune
+    private static final double[] SHOOT_ROTATIONS = new double[]{0, 0, 0}; // TODO: tune
 
     public enum Ball {
         GREEN,
