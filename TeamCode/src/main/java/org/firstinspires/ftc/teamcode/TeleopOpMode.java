@@ -15,6 +15,8 @@ import org.firstinspires.ftc.teamcode.lib.subsystems.ShooterSubsystem;
 
 @TeleOp(name = "TeleOp")
 public class TeleopOpMode extends OpMode {
+    private static final boolean DISABLE_COLOR_SENSOR = false;
+
     DriveSubsystem drive;
     LiftSubsystem lift;
     IntakeSubsystem intake;
@@ -40,13 +42,15 @@ public class TeleopOpMode extends OpMode {
     private final ElapsedTime timer = new ElapsedTime();
     private double shootTime = 0;
     private double currentArc = 0;
+    private double intakeTime = 0;
+    private boolean intakenRecently = false;
 
     @Override
     public void init() {
         drive = new DriveSubsystem(hardwareMap, telemetry);
         lift = new LiftSubsystem(hardwareMap, telemetry);
         intake = new IntakeSubsystem(hardwareMap, telemetry);
-        index = new IndexSubsystem(hardwareMap, telemetry);
+        index = new IndexSubsystem(hardwareMap, telemetry, DISABLE_COLOR_SENSOR);
         shooter = new ShooterSubsystem(hardwareMap, telemetry);
         led = new LEDSubsystem(hardwareMap, telemetry);
     }
@@ -155,6 +159,19 @@ public class TeleopOpMode extends OpMode {
             lift.setPower(-1);
         } else {
             lift.setPower(0);
+        }
+
+        // alternative ball detection implementation based on detecting current spike in the intake
+        // motor (used if the colour sensor does not work)
+        if (DISABLE_COLOR_SENSOR) {
+            if (intake.ballIntaken()) {
+                intakeTime = timer.time();
+                intakenRecently = true;
+            }
+            if (intakenRecently && timer.time() - intakeTime > 0.3) {
+                index.unsafe_manuallyMarkIntake();
+                intakenRecently = false;
+            }
         }
 
         drive.periodic();
