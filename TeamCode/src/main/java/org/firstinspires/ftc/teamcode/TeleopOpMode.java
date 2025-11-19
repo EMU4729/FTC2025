@@ -149,14 +149,13 @@ public class TeleopOpMode extends OpMode {
         }
 
         //Raises or lowers lift
-        if (gamepad1.right_trigger > 0.5){
+        if (gamepad1.right_trigger > 0.5) {
             lift.setPower(1);
-        } else if (gamepad1.left_trigger > 0.5){
+        } else if (gamepad1.left_trigger > 0.5) {
             lift.setPower(-1);
         } else {
             lift.setPower(0);
         }
-
 
         drive.periodic();
         lift.periodic();
