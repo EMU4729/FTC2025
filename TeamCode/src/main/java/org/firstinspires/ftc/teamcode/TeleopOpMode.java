@@ -73,7 +73,7 @@ public class TeleopOpMode extends OpMode {
             shootMode = IndexSubsystem.Mode.SHOOT_PURPLE_ONLY;
             led.setSolidColor(Color.rgb(128, 0, 128)); // purple
             telemetry.addData("Current Ball", "PURPLE");
-        } else if (gamepad2.y) {
+        } else if (gamepad2.b) {
             shootMode = IndexSubsystem.Mode.SHOOT_ANY;
             led.setMode(LEDSubsystem.Mode.RAINBOW);
             telemetry.addData("Current Ball", "ANY");
