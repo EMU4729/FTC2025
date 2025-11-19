@@ -17,25 +17,6 @@ public class LiftSubsystem extends SubsystemBase {
         leftMotor = hardwareMap.get(DcMotorEx.class, "liftL");
         rightMotor = hardwareMap.get(DcMotorEx.class, "liftR");
         rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-//        leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        leftMotor.setTargetPosition(0);
-//        rightMotor.setTargetPosition(0);
-//        leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        leftMotor.setPositionPIDFCoefficients(LIFT_PID_P);
-//        rightMotor.setPositionPIDFCoefficients(LIFT_PID_P);
-    }
-
-    /**
-     * sets left right motor target position to given distance
-     *
-     * @param pos the distance in m
-     */
-    private void liftGoTo(double pos) {
-        int _pos = (int) (pos / LIFT_DISTANCE_PER_TICK);
-        leftMotor.setTargetPosition(_pos);
-        rightMotor.setTargetPosition(_pos);
     }
 
     /**
