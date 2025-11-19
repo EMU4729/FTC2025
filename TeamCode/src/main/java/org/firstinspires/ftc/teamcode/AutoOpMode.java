@@ -51,7 +51,7 @@ public class AutoOpMode extends OpMode {
                 break;
             case MOVING_TO_SHOOT_POSITION:
                 goToShootPositionCommand.execute();
-                if (goToShootPositionCommand.atTarget()) state = State.SHOOTING;
+                if (goToShootPositionCommand.atTarget()) state = State.WAITING_TO_SHOOT;
                 break;
             case WAITING_TO_SHOOT:
                 if (index.atTarget() && shooter.atDesiredSpeed()) {
