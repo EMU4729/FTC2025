@@ -14,13 +14,13 @@ public class ShooterSubsystem extends SubsystemBase {
     private static final double SHOOTER_PID_D = 0; // TODO: tune
 
     private final DcMotorEx motor;
-    private final Servo arcServo;
+    private final Servo tiltServo;
     private final Servo popServo;
     private double vel = 0;
 
     public ShooterSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
-        motor = hardwareMap.get(DcMotorEx.class, "shooterL");
-        arcServo = hardwareMap.get(Servo.class, "shooterArc");
+        motor = hardwareMap.get(DcMotorEx.class, "shooterMotor");
+        tiltServo = hardwareMap.get(Servo.class, "shooterTilt");
         popServo = hardwareMap.get(Servo.class, "shooterPop");
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motor.setVelocityPIDFCoefficients(SHOOTER_PID_P, SHOOTER_PID_I, SHOOTER_PID_D, 0);
@@ -50,8 +50,8 @@ public class ShooterSubsystem extends SubsystemBase {
      *
      * @param arc The arc servo's position, in the range [0, 1]
      */
-    public void setArc(double arc) {
-        arcServo.setPosition(arc);
+    public void setTilt(double arc) {
+        tiltServo.setPosition(arc);
     }
 
     /**
