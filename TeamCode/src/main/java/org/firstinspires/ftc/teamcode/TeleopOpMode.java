@@ -112,9 +112,9 @@ public class TeleopOpMode extends OpMode {
 
         // Shooter arc control
         if (gamepad2.dpad_up) {
-            shooterTilt += 1;
+            shooterTilt += 0.05;
         } else if (gamepad2.dpad_down) {
-            shooterTilt -= 1;
+            shooterTilt -= 0.05;
         }
         shooter.setTilt(shooterTilt);
 
