@@ -4,6 +4,7 @@ import android.graphics.Color;
 
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
@@ -61,6 +62,7 @@ public class IndexSubsystem extends SubsystemBase {
         this.telemetry = telemetry;
         this.disableColorSensor = disableColorSensor;
         servo = hardwareMap.get(CRServo.class, "indexServo");
+        servo.setDirection(DcMotorSimple.Direction.REVERSE);
         encoder = hardwareMap.get(AnalogInput.class, "indexEncoder");
         colorSensor = hardwareMap.get(NormalizedColorSensor.class, "indexColorSensor");
 
@@ -242,6 +244,7 @@ public class IndexSubsystem extends SubsystemBase {
         telemetry.addData("Indexer At Target", atTarget());
         telemetry.addData("Indexer Mode", mode);
         telemetry.addData("Indexer Servo Power", servo.getPower());
+        telemetry.addData("Indexer Max Voltage", encoder.getMaxVoltage());
     }
 
     /**
@@ -262,10 +265,10 @@ public class IndexSubsystem extends SubsystemBase {
                 servo.setPower(0);
                 return;
             case CLOCKWISE:
-                servo.setPower(1);
+                servo.setPower(0.05);
                 return;
             case ANTICLOCKWISE:
-                servo.setPower(-1);
+                servo.setPower(-0.05);
                 return;
         }
 

@@ -18,11 +18,11 @@ public class TeleopOpMode extends OpMode {
     private static final boolean DISABLE_COLOR_SENSOR = false;
 
     DriveSubsystem drive;
-    LiftSubsystem lift;
+//    LiftSubsystem lift;
     IntakeSubsystem intake;
     IndexSubsystem index;
     ShooterSubsystem shooter;
-    LEDSubsystem led;
+//    LEDSubsystem led;
 
     private enum ShootState {
         IDLE,
@@ -48,11 +48,11 @@ public class TeleopOpMode extends OpMode {
     @Override
     public void init() {
         drive = new DriveSubsystem(hardwareMap, telemetry);
-        lift = new LiftSubsystem(hardwareMap, telemetry);
-        intake = new IntakeSubsystem(hardwareMap, telemetry);
+//        lift = new LiftSubsystem(hardwareMap, telemetry);
+//        intake = new IntakeSubsystem(hardwareMap, telemetry);
         index = new IndexSubsystem(hardwareMap, telemetry, DISABLE_COLOR_SENSOR);
         shooter = new ShooterSubsystem(hardwareMap, telemetry);
-        led = new LEDSubsystem(hardwareMap, telemetry);
+//        led = new LEDSubsystem(hardwareMap, telemetry);
     }
 
     @Override
@@ -64,18 +64,18 @@ public class TeleopOpMode extends OpMode {
     public void loop() {
         drive.driveRobotRelative(-gamepad2.left_stick_y, -gamepad2.left_stick_x, -gamepad2.right_stick_x);
 
-        // select colour conditional statements
+//         select colour conditional statements
         if (gamepad2.a) {
             shootMode = IndexSubsystem.Mode.SHOOT_GREEN_ONLY;
-            led.setSolidColor(Color.GREEN);
+//            led.setSolidColor(Color.GREEN);
             telemetry.addData("Current Ball", "GREEN");
         } else if (gamepad2.x) {
             shootMode = IndexSubsystem.Mode.SHOOT_PURPLE_ONLY;
-            led.setSolidColor(Color.rgb(128, 0, 128)); // purple
+//            led.setSolidColor(Color.rgb(128, 0, 128)); // purple
             telemetry.addData("Current Ball", "PURPLE");
         } else if (gamepad2.b) {
             shootMode = IndexSubsystem.Mode.SHOOT_ANY;
-            led.setMode(LEDSubsystem.Mode.RAINBOW);
+//            led.setMode(LEDSubsystem.Mode.RAINBOW);
             telemetry.addData("Current Ball", "ANY");
         }
 
@@ -116,7 +116,7 @@ public class TeleopOpMode extends OpMode {
         } else if (gamepad2.dpad_down) {
             shooterTilt -= 0.05;
         }
-        shooter.setTilt(shooterTilt);
+//        shooter.setTilt(shooterTilt);
 
         // Shoot state FSM
         boolean spinUp = gamepad1.right_trigger > 0.5 || gamepad2.right_trigger > 0.5;
@@ -126,61 +126,61 @@ public class TeleopOpMode extends OpMode {
             shootState = ShootState.IDLE;
         }
 
-        switch (shootState) {
-            case IDLE:
-                shooter.setSpeed(0);
-                shooter.unpop();
-                break;
-
-            case PREPARING:
-                index.setMode(shootMode);
-                shooter.setSpeed(gamepad2.y ? 0.5 : 2);
-                if (index.atTarget() && shooter.atDesiredSpeed() && gamepad2.right_trigger > 0.5) {
-                    shootState = ShootState.SHOOTING;
-                    shootTime = timer.time();
-                }
-                break;
-
-            case SHOOTING:
-                shooter.pop();
-                shootMode = IndexSubsystem.Mode.SHOOT_ANY;
-
-                if (timer.time() - shootTime > 0.5) {
-                    shooter.unpop();
-                    index.emptyCurrentSlot();
-                    shootState = ShootState.PREPARING;
-                }
-                break;
-        }
+//        switch (shootState) {
+//            case IDLE:
+//                shooter.setSpeed(0);
+//                shooter.unpop();
+//                break;
+//
+//            case PREPARING:
+//                index.setMode(shootMode);
+//                shooter.setSpeed(gamepad2.y ? 0.5 : 2);
+//                if (index.atTarget() && shooter.atDesiredSpeed() && gamepad2.right_trigger > 0.5) {
+//                    shootState = ShootState.SHOOTING;
+//                    shootTime = timer.time();
+//                }
+//                break;
+//
+//            case SHOOTING:
+//                shooter.pop();
+//                shootMode = IndexSubsystem.Mode.SHOOT_ANY;
+//
+//                if (timer.time() - shootTime > 0.5) {
+//                    shooter.unpop();
+//                    index.emptyCurrentSlot();
+//                    shootState = ShootState.PREPARING;
+//                }
+//                break;
+//        }
 
         //Raises or lowers lift
-        if (gamepad1.dpad_up) {
-            lift.setPower(1);
-        } else if (gamepad1.dpad_down) {
-            lift.setPower(-1);
-        } else {
-            lift.setPower(0);
-        }
+//        if (gamepad1.dpad_up) {
+//            lift.setPower(1);
+//        } else if (gamepad1.dpad_down) {
+//            lift.setPower(-1);
+//        } else {
+//            lift.setPower(0);
+//        }
 
         // alternative ball detection implementation based on detecting current spike in the intake
         // motor (used if the colour sensor does not work)
-        if (DISABLE_COLOR_SENSOR) {
-            if (intake.ballIntaken()) {
-                intakeTime = timer.time();
-                intakenRecently = true;
-            }
-            if (intakenRecently && timer.time() - intakeTime > 0.3) {
-                index.unsafe_manuallyMarkIntake();
-                intakenRecently = false;
-            }
-        }
+//        if (DISABLE_COLOR_SENSOR) {
+//            if (intake.ballIntaken()) {
+//                intakeTime = timer.time();
+//                intakenRecently = true;
+//            }
+//            if (intakenRecently && timer.time() - intakeTime > 0.3) {
+//                index.unsafe_manuallyMarkIntake();
+//                intakenRecently = false;
+//            }
+//        }
 
         drive.periodic();
-        lift.periodic();
-        intake.periodic();
-        index.periodic();
-        shooter.periodic();
-        led.periodic();
+//        lift.periodic();
+//        intake.periodic();
+//        index.periodic();
+//        shooter.periodic();
+//        led.periodic();
         telemetry.update();
     }
 }
