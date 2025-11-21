@@ -46,12 +46,12 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     /**
-     * Sets the position of the arc servo
+     * Sets the position of the tilt servo
      *
-     * @param arc The arc servo's position, in the range [0, 1]
+     * @param tilt The tilt servo's position, in the range [0, 1]
      */
-    public void setTilt(double arc) {
-        tiltServo.setPosition(arc);
+    public void setTilt(double tilt) {
+        tiltServo.setPosition(tilt);
     }
 
     /**
