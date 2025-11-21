@@ -11,6 +11,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private static final double INTAKE_CURRENT_THRESHOLD = 1; // TODO: tune
     private final DcMotorEx spinMotor;
     private final Telemetry telemetry;
+    private double maxCurrent = 0;
 
     public IntakeSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         spinMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
@@ -20,7 +21,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        telemetry.addData("Intake Motor Current (A)", spinMotor.getCurrent(CurrentUnit.AMPS));
+        double motorCurrent = spinMotor.getCurrent(CurrentUnit.AMPS);
+        maxCurrent = Math.max(maxCurrent, motorCurrent);
+        telemetry.addData("Intake Motor Current (A)", motorCurrent);
+        telemetry.addData("Intake Max Current (A)", maxCurrent);
     }
 
     /**

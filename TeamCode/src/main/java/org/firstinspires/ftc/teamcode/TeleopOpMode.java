@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Color;
-
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -9,8 +7,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.lib.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.IndexSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.lib.subsystems.LEDSubsystem;
-import org.firstinspires.ftc.teamcode.lib.subsystems.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.ShooterSubsystem;
 
 @TeleOp(name = "TeleOp")
@@ -32,8 +28,8 @@ public class TeleopOpMode extends OpMode {
 
     private enum IntakeState {
         IDLE,
-        READY,
-        PULL,
+        PREPARING,
+        INTAKING,
     }
 
     private ShootState shootState = ShootState.IDLE;
@@ -81,7 +77,7 @@ public class TeleopOpMode extends OpMode {
 
         // intake FSM
         if (gamepad2.left_trigger > 0.5 && intakeState == IntakeState.IDLE) {
-            intakeState = IntakeState.READY;
+            intakeState = IntakeState.PREPARING;
         } else if (gamepad2.left_trigger <= 0.5) {
             intakeState = IntakeState.IDLE;
         }
@@ -92,20 +88,20 @@ public class TeleopOpMode extends OpMode {
                 intake.setPower(0);
                 break;
 
-            case READY:
+            case PREPARING:
                 // primes the indexer
                 index.setMode(IndexSubsystem.Mode.INTAKE);
                 intake.setPower(0);
                 if (index.atTarget()) {
-                    intakeState = IntakeState.PULL;
+                    intakeState = IntakeState.INTAKING;
                 }
                 break;
 
-            case PULL:
+            case INTAKING:
                 // Pulls the ball in
                 intake.setPower(1);
                 if (index.ballIntaken()) {
-                    intakeState = IntakeState.READY;
+                    intakeState = IntakeState.PREPARING;
                 }
                 break;
         }
@@ -116,7 +112,7 @@ public class TeleopOpMode extends OpMode {
         } else if (gamepad2.dpad_down) {
             shooterTilt -= 0.05;
         }
-//        shooter.setTilt(shooterTilt);
+        shooter.setTilt(shooterTilt);
 
         // Shoot state FSM
         boolean spinUp = gamepad1.right_trigger > 0.5 || gamepad2.right_trigger > 0.5;
