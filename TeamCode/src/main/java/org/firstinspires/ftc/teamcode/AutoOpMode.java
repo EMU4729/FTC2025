@@ -11,6 +11,8 @@ import org.firstinspires.ftc.teamcode.lib.subsystems.IndexSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.LocalisationSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.ShooterSubsystem;
 
+import java.util.concurrent.TimeUnit;
+
 @Autonomous(name = "Auto")
 public class AutoOpMode extends OpMode {
     private DriveSubsystem drive;
@@ -19,17 +21,18 @@ public class AutoOpMode extends OpMode {
     private LocalisationSubsystem localisation;
 
     private enum State {
+        MOVING_BACK,
         INITIALISING_OTOS,
         MOVING_TO_SHOOT_POSITION,
         WAITING_TO_SHOOT,
         SHOOTING,
     }
 
-    private State state = State.INITIALISING_OTOS;
+    private State state = State.MOVING_BACK;
     private DriveGoTo goToShootPositionCommand;
-
     private final ElapsedTime timer = new ElapsedTime();
     private double shootTime = 0;
+    private double movingBackTime = 0;
 
     @Override
     public void init() {
@@ -42,10 +45,21 @@ public class AutoOpMode extends OpMode {
     }
 
     @Override
+    public void start() {
+        movingBackTime = timer.time();
+    }
+
+    @Override
     public void loop() {
         index.setMode(IndexSubsystem.Mode.SHOOT_ANY);
         shooter.setSpeed(1);
         switch (state) {
+            case MOVING_BACK:
+                drive.driveRobotRelative(0, -0.1, 0);
+                if (timer.time() - movingBackTime >= 200) {
+                    drive.stop();
+                    state = State.INITIALISING_OTOS;
+                }
             case INITIALISING_OTOS:
                 if (localisation.isInitialised()) state = State.MOVING_TO_SHOOT_POSITION;
                 break;
