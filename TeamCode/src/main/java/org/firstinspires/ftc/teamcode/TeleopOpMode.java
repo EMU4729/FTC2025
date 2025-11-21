@@ -62,7 +62,7 @@ public class TeleopOpMode extends OpMode {
 
     @Override
     public void loop() {
-        drive.driveRobotRelative(-gamepad2.left_stick_y, gamepad2.left_stick_x, -gamepad2.right_stick_x);
+        drive.driveRobotRelative(-gamepad2.left_stick_y, -gamepad2.left_stick_x, -gamepad2.right_stick_x);
 
         // select colour conditional statements
         if (gamepad2.a) {
