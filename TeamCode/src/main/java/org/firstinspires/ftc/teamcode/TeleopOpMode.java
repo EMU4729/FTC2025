@@ -119,9 +119,10 @@ public class TeleopOpMode extends OpMode {
         shooter.setTilt(shooterTilt);
 
         // Shoot state FSM
-        if (gamepad2.right_trigger > 0.5 && shootState == ShootState.IDLE) {
+        boolean spinUp = gamepad1.right_trigger > 0.5 || gamepad2.right_trigger > 0.5;
+        if (spinUp && shootState == ShootState.IDLE) {
             shootState = ShootState.PREPARING;
-        } else if (gamepad2.right_trigger <= 0.5) {
+        } else if (!spinUp) {
             shootState = ShootState.IDLE;
         }
 
@@ -134,7 +135,7 @@ public class TeleopOpMode extends OpMode {
             case PREPARING:
                 index.setMode(shootMode);
                 shooter.setSpeed(gamepad2.y ? 0.5 : 2);
-                if (index.atTarget() && shooter.atDesiredSpeed()) {
+                if (index.atTarget() && shooter.atDesiredSpeed() && gamepad2.right_trigger > 0.5) {
                     shootState = ShootState.SHOOTING;
                     shootTime = timer.time();
                 }
@@ -153,9 +154,9 @@ public class TeleopOpMode extends OpMode {
         }
 
         //Raises or lowers lift
-        if (gamepad1.right_trigger > 0.5) {
+        if (gamepad1.dpad_up) {
             lift.setPower(1);
-        } else if (gamepad1.left_trigger > 0.5) {
+        } else if (gamepad1.dpad_down) {
             lift.setPower(-1);
         } else {
             lift.setPower(0);
