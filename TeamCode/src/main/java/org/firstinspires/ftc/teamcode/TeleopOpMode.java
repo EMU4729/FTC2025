@@ -112,9 +112,9 @@ public class TeleopOpMode extends OpMode {
 
         // Shooter arc control
         if (gamepad2.dpad_up) {
-            currentArc += 5;
+            currentArc += 1;
         } else if (gamepad2.dpad_down) {
-            currentArc -= 5;
+            currentArc -= 1;
         }
         shooter.setArc(currentArc);
 
