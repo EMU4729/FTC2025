@@ -17,6 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 public class LiftSubsystem extends SubsystemBase {
     private static final double LIFT_DISTANCE_PER_TICK = 1 / 537.7;
     private static final double LIFT_PID_P = 1;
+    private static final double SYNC_P_GAIN = 0.005;
 
     private final DcMotorEx leftMotor;
     private final DcMotorEx rightMotor;
@@ -50,6 +51,19 @@ private IMU imu;
 // Initialize IMU using Parameters
 
         imu.initialize(myIMUparameters);
+
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        // Check your physical wiring to confirm which one needs reverse
+        rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        // Reset encoders so 0 is the bottom
+        leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void periodic() {
@@ -86,17 +100,38 @@ private IMU imu;
 
 
     }
+    private double clamp(double val) {
+        return Math.max(-1.0, Math.min(1.0, val));
+    }
 
     /**
      * Directly sets the power of the lift motors.
      *
-     * @param power The power in the range [-1, 1]
+     * @param targetPower The power in the range [-1, 1]
      */
-    public void setPower(double power) {
-        leftMotor.setPower(power);
-        leftMotor.
-        rightMotor.setPower(power);
+    public void setPower(double targetPower) {
+        // Get positions
+        int leftPos = leftMotor.getCurrentPosition();
+        int rightPos = rightMotor.getCurrentPosition();
+
+        // Calculate difference (Error)
+        // If left is at 1000 and right is at 800, error is 200.
+        int error = leftPos - rightPos;
+
+        // Calculate correction
+        // If left is higher (positive error), we subtract power from left (or add to right).
+        double correction = error * SYNC_P_GAIN;
+
+        // Apply power with correction
+        // We restrain the values to ensure they don't exceed +/- 1.0
+        double leftPower = targetPower - correction;
+        double rightPower = targetPower + correction;
+
+        // Safety clamp
+        leftMotor.setPower(clamp(leftPower));
+        rightMotor.setPower(clamp(rightPower));
     }
+
 
     public void setLeftPower(double power) {
         leftMotor.setPower(power);
