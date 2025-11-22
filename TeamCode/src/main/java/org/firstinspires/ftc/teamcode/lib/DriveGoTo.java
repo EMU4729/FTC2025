@@ -6,9 +6,9 @@ import org.firstinspires.ftc.teamcode.lib.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.LocalisationSubsystem;
 
 public class DriveGoTo {
-    private static final double TRANSLATION_P = 0.1; // TODO: tune
-    private static final double TRANSLATION_FF = 0.1; // TODO: tune
-    private static final double ROTATION_P = 0.1; // TODO: tune
+    private static final double TRANSLATION_P = 0.3; // TODO: tune
+    private static final double TRANSLATION_FF = 0.2; // TODO: tune
+    private static final double ROTATION_P = 0.2; // TODO: tune
     private static final double ROTATION_FF = 0.1; // TODO: tune
     private static final double TRANSLATION_THRESH = 0.1; // TODO: tune
     private static final double ROTATION_THRESH = 0.1; // TODO: tune
