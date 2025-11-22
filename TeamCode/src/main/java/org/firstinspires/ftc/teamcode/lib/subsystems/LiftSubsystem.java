@@ -22,35 +22,20 @@ public class LiftSubsystem extends SubsystemBase {
     private final DcMotorEx leftMotor;
     private final DcMotorEx rightMotor;
     private final Telemetry telemetry;
-private IMU imu;
+
     public LiftSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         leftMotor = hardwareMap.get(DcMotorEx.class, "liftL");
         rightMotor = hardwareMap.get(DcMotorEx.class, "liftR");
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        imu = hardwareMap.get(imu.getClass(), "imu_lift");
+
         this.telemetry = telemetry;
 
-        IMU.Parameters myIMUparameters;
-
-        myIMUparameters = new IMU.Parameters(
-                new RevHubOrientationOnRobot(
-                        new Orientation(
-                                AxesReference.INTRINSIC,
-                                AxesOrder.ZYX,
-                                AngleUnit.DEGREES,
-                                90,
-                                0,
-                                -45,
-                                0  // acquisitionTime, not used
-                        )
-                )
-        );
 
 // Initialize IMU using Parameters
 
-        imu.initialize(myIMUparameters);
+
 
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -71,31 +56,6 @@ private IMU imu;
         telemetry.addData("Lift Right Conn", leftMotor.getConnectionInfo());
 
 
-        // Create Orientation variable
-        Orientation myRobotOrientation;
-
-// Get Robot Orientation
-        myRobotOrientation = imu.getRobotOrientation(
-                AxesReference.INTRINSIC,
-                AxesOrder.XYZ,
-                AngleUnit.DEGREES
-        );
-
-// Then read or display the desired values (Java type float):
-        float X_axis = myRobotOrientation.firstAngle;
-        float Y_axis = myRobotOrientation.secondAngle;
-        float Z_axis = myRobotOrientation.thirdAngle;
-
-        AngularVelocity myRobotAngularVelocity;
-
-// Read Angular Velocities
-        myRobotAngularVelocity = imu.getRobotAngularVelocity(AngleUnit.DEGREES);
-
-// Then read or display these values (Java type float)
-// from the object you just created:
-        float zRotationRate = myRobotAngularVelocity.zRotationRate;
-        float xRotationRate = myRobotAngularVelocity.xRotationRate;
-        float yRotationRate = myRobotAngularVelocity.yRotationRate;
 
 
 
