@@ -7,18 +7,21 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.lib.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.IndexSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.lib.subsystems.LiftSubsystem;
+import org.firstinspires.ftc.teamcode.lib.subsystems.LocalisationSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.ShooterSubsystem;
 
 @TeleOp(name = "TeleOp")
 public class TeleopOpMode extends OpMode {
-    private static final boolean DISABLE_COLOR_SENSOR = false;
+    private static final boolean DISABLE_COLOR_SENSOR = true;
 
     DriveSubsystem drive;
-//    LiftSubsystem lift;
+    LiftSubsystem lift;
     IntakeSubsystem intake;
     IndexSubsystem index;
     ShooterSubsystem shooter;
 //    LEDSubsystem led;
+    LocalisationSubsystem localisation;
 
     private enum ShootState {
         IDLE,
@@ -44,11 +47,12 @@ public class TeleopOpMode extends OpMode {
     @Override
     public void init() {
         drive = new DriveSubsystem(hardwareMap, telemetry);
-//        lift = new LiftSubsystem(hardwareMap, telemetry);
-//        intake = new IntakeSubsystem(hardwareMap, telemetry);
+        lift = new LiftSubsystem(hardwareMap, telemetry);
+        intake = new IntakeSubsystem(hardwareMap, telemetry);
         index = new IndexSubsystem(hardwareMap, telemetry, DISABLE_COLOR_SENSOR);
         shooter = new ShooterSubsystem(hardwareMap, telemetry);
 //        led = new LEDSubsystem(hardwareMap, telemetry);
+        localisation = new LocalisationSubsystem(hardwareMap, telemetry);
     }
 
     @Override
@@ -157,29 +161,29 @@ public class TeleopOpMode extends OpMode {
         }
 
         //Raises or lowers lift
-//        if (gamepad1.dpad_up) {
-//            lift.setPower(1);
-//        } else if (gamepad1.dpad_down) {
-//            lift.setPower(-1);
-//        } else {
-//            lift.setPower(0);
-//        }
+        if (gamepad1.dpad_up) {
+            lift.setPower(1);
+        } else if (gamepad1.dpad_down) {
+            lift.setPower(-1);
+        } else {
+            lift.setPower(0);
+        }
 
         // alternative ball detection implementation based on detecting current spike in the intake
         // motor (used if the colour sensor does not work)
-//        if (DISABLE_COLOR_SENSOR) {
-//            if (intake.ballIntaken()) {
-//                intakeTime = timer.time();
-//                intakenRecently = true;
-//            }
-//            if (intakenRecently && timer.time() - intakeTime > 0.3) {
-//                index.unsafe_manuallyMarkIntake();
-//                intakenRecently = false;
-//            }
-//        }
+        if (DISABLE_COLOR_SENSOR) {
+            if (intake.ballIntaken()) {
+                intakeTime = timer.time();
+                intakenRecently = true;
+            }
+            if (intakenRecently && timer.time() - intakeTime > 0.3) {
+                index.unsafe_manuallyMarkIntake();
+                intakenRecently = false;
+            }
+        }
 
         drive.periodic();
-//        lift.periodic();
+        lift.periodic();
         intake.periodic();
         index.periodic();
         shooter.periodic();

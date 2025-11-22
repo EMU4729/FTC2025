@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.lib.subsystems;
 
+import android.util.Size;
+
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -17,15 +19,13 @@ import java.util.List;
 import java.util.Optional;
 
 public class LocalisationSubsystem {
-    private static final double OTOS_LINEAR_SCALAR = 1.0; // todo: find exact value, need robot physically
-    private static final double OTOS_ANGULAR_SCALAR = 1.0; // todo: find exact value, need robot physically
-    private static final SparkFunOTOS.Pose2D OTOS_OFFSET = new SparkFunOTOS.Pose2D(0, 0, 0); // todo: find exact values, need robot physically
+    private static final double OTOS_LINEAR_SCALAR = 1.0;
+    private static final double OTOS_ANGULAR_SCALAR = 1.0;
+    private static final SparkFunOTOS.Pose2D OTOS_OFFSET = new SparkFunOTOS.Pose2D(0, 0, 0);
     private static final Position CAMERA_POSITION = new Position(
-            DistanceUnit.METER, 0, 0, 0, 0); // TODO: find exact values, need robot physically
-
-    // pitch was init'd as -90 in demo, but set to 0 here for now (-90 made no sense)
+            DistanceUnit.METER, -0.13, -0.16, 0.045, 0);
     private static final YawPitchRollAngles CAMERA_ORIENTATION = new YawPitchRollAngles(AngleUnit.DEGREES,
-            0, -45, 0, 0);
+            180, -45, 0, 0);
     private static final IndexSubsystem.Ball[][] OBELISK_PATTERNS = {
             {IndexSubsystem.Ball.GREEN, IndexSubsystem.Ball.PURPLE, IndexSubsystem.Ball.PURPLE},
             {IndexSubsystem.Ball.GREEN, IndexSubsystem.Ball.PURPLE, IndexSubsystem.Ball.PURPLE},
@@ -50,7 +50,9 @@ public class LocalisationSubsystem {
                 .build();
 
         visionPortal = new VisionPortal.Builder()
-                .setCamera(hardwareMap.get(WebcamName.class, "webcam"))
+                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
+                .setCameraResolution(new Size(1280, 800))
                 .addProcessor(aprilTag)
                 .build();
 

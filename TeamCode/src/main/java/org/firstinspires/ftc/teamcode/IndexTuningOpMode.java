@@ -69,11 +69,12 @@ public class IndexTuningOpMode extends OpMode {
 
         float[] lower = new float[]{values[0], values[1], values[2]};
         float[] upper = new float[]{values[3], values[4], values[5]};
+        float[] hsv = index.getHSV();
 
         telemetry.addData("Currently Modifying", VALUE_LABELS[currentValue]);
-        telemetry.addData("HSV Upper Bound", upper);
-        telemetry.addData("HSV Lower Bound", lower);
-        telemetry.addData("Current HSV", index.getHSV());
+        telemetry.addData("HSV Upper Bound", String.format("(%f, %f, %f)", upper[0], upper[1], upper[2]));
+        telemetry.addData("HSV Lower Bound", String.format("(%f, %f, %f)", lower[0], lower[1], lower[2]));
+        telemetry.addData("Current HSV", String.format("(%f, %f, %f)", hsv[0], hsv[1], hsv[2]));
         telemetry.addData("Current Gain", index.getGain());
         telemetry.addData("In Bounds?", IndexSubsystem.hsvInRange(index.getHSV(), lower, upper));
         index.periodic();

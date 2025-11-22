@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -26,6 +27,8 @@ public class IndexSubsystem extends SubsystemBase {
         SHOOT_GREEN_ONLY,
         CLOCKWISE,
         ANTICLOCKWISE,
+        INTAKE_MANUAL,
+        SHOOT_MANUAL
     }
 
     private static final float COLOR_SENSOR_GAIN = 1; // TODO: tune
@@ -34,8 +37,8 @@ public class IndexSubsystem extends SubsystemBase {
     private static final float[] GREEN_MIN_HSV = new float[]{0, 0, 0}; // TODO: tune
     private static final float[] GREEN_MAX_HSV = new float[]{0, 0, 0}; // TODO: tune
 
-    private static final double[] INTAKE_ROTATIONS = new double[]{0, 0, 0}; // TODO: tune
-    private static final double[] SHOOT_ROTATIONS = new double[]{0, 0, 0}; // TODO: tune
+    private static final double[] INTAKE_ROTATIONS = new double[]{Math.toRadians(115), Math.toRadians(235), Math.toRadians(2)}; // TODO: tune
+    private static final double[] SHOOT_ROTATIONS = new double[]{Math.toRadians(304), Math.toRadians(60), Math.toRadians(182)}; // TODO: tune
 
     public enum Ball {
         GREEN,
@@ -44,7 +47,7 @@ public class IndexSubsystem extends SubsystemBase {
     }
 
     private final Telemetry telemetry;
-    private final CRServo servo;
+    private final Servo servo;
     private final AnalogInput encoder;
     private final NormalizedColorSensor colorSensor;
     private final Ball[] storage = new Ball[]{Ball.EMPTY, Ball.EMPTY, Ball.EMPTY};
@@ -53,6 +56,7 @@ public class IndexSubsystem extends SubsystemBase {
     private double rotation = 0;
     private boolean atTarget = false;
     private boolean ballRecentlyIntaken = false;
+    private int manualIndex = 0;
 
     public IndexSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this(hardwareMap, telemetry, false);
@@ -61,17 +65,22 @@ public class IndexSubsystem extends SubsystemBase {
     public IndexSubsystem(HardwareMap hardwareMap, Telemetry telemetry, boolean disableColorSensor) {
         this.telemetry = telemetry;
         this.disableColorSensor = disableColorSensor;
-        servo = hardwareMap.get(CRServo.class, "indexServo");
-        servo.setDirection(DcMotorSimple.Direction.REVERSE);
+        servo = hardwareMap.get(Servo.class, "indexServo");
+        servo.setDirection(Servo.Direction.REVERSE);
         encoder = hardwareMap.get(AnalogInput.class, "indexEncoder");
         colorSensor = hardwareMap.get(NormalizedColorSensor.class, "indexColorSensor");
 
         // yes, this is officially how you switch on the led on a color sensor with a switchable led
         // yes, i hate it too
         if (colorSensor instanceof SwitchableLight) {
+            telemetry.addData("Clor sensor switchlight", true);
             ((SwitchableLight) (colorSensor)).enableLight(true);
         }
         setGain(COLOR_SENSOR_GAIN);
+    }
+
+    public void setManualIndex(int index) {
+        manualIndex = index;
     }
 
     /**
@@ -176,8 +185,8 @@ public class IndexSubsystem extends SubsystemBase {
     /**
      * Returns the relative angle between two angles, accounting for continuous rotation
      *
-     * @param a The first angle, in the range [0, 2*Pi]
-     * @param b The second angle, in the range [0, 2*Pi]
+     * @param a The first angle, in the range [0, 360]
+     * @param b The second angle, in the range [0, 360]
      * @return The wrapped signed angle between a and b
      */
     private double wrappedSignedAngleBetween(double a, double b) {
@@ -243,8 +252,10 @@ public class IndexSubsystem extends SubsystemBase {
         telemetry.addData("Indexer Rotation (deg)", Math.toDegrees(rotation));
         telemetry.addData("Indexer At Target", atTarget());
         telemetry.addData("Indexer Mode", mode);
-        telemetry.addData("Indexer Servo Power", servo.getPower());
-        telemetry.addData("Indexer Max Voltage", encoder.getMaxVoltage());
+        telemetry.addData("Indexer Servo Power", servo.getPosition());
+        telemetry.addData("Indexer Color Sensor Raw", colorSensor.getNormalizedColors().toColor());
+        telemetry.addData("Indexer Color Sensor Conn Info", colorSensor.getConnectionInfo());
+        telemetry.addData("Indexer Manual Index", manualIndex);
     }
 
     /**
@@ -262,13 +273,13 @@ public class IndexSubsystem extends SubsystemBase {
 
         switch (mode) {
             case IDLE:
-                servo.setPower(0);
+                servo.setPosition(0.5);
                 return;
             case CLOCKWISE:
-                servo.setPower(0.05);
+                servo.setPosition(0.55);
                 return;
             case ANTICLOCKWISE:
-                servo.setPower(-0.05);
+                servo.setPosition(0.45);
                 return;
         }
 
@@ -295,17 +306,32 @@ public class IndexSubsystem extends SubsystemBase {
                 rotations = SHOOT_ROTATIONS;
                 closestSlotIndex = closestSlot(SHOOT_ROTATIONS, (i) -> storage[i] == Ball.PURPLE);
                 break;
+            case SHOOT_MANUAL:
+                rotations = SHOOT_ROTATIONS;
+                closestSlotIndex = manualIndex;
+                break;
+            case INTAKE_MANUAL:
+                rotations = INTAKE_ROTATIONS;
+                closestSlotIndex = manualIndex;
+                break;
         }
 
         if (closestSlotIndex == -1) {
             // no available closest slot, idle
             atTarget = false;
-            servo.setPower(0);
+            servo.setPosition(0.5);
             return;
         }
 
-        double error = wrappedSignedAngleBetween(rotations[closestSlotIndex], rotation);
-        servo.setPower(error);
+        double error = wrappedSignedAngleBetween(rotation, rotations[closestSlotIndex]);
+        telemetry.addData("index error", error);
+        if (error > 0.1) {
+            servo.setPosition(0.45);
+        } else if (error < -0.1) {
+            servo.setPosition(0.55);
+        } else {
+            servo.setPosition(0.5);
+        }
         atTarget = Math.abs(error) < 0.1;
     }
 }

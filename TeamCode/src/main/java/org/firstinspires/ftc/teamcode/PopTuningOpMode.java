@@ -17,9 +17,9 @@ public class PopTuningOpMode extends OpMode {
     @Override
     public void loop() {
         if (gamepad1.dpad_up) {
-            value += 0.01;
+            value += 0.001;
         } else if (gamepad1.dpad_down) {
-            value -= 0.01;
+            value -= 0.001;
         }
         popServo.setPosition(value);
         telemetry.addData("Servo Position", value);
