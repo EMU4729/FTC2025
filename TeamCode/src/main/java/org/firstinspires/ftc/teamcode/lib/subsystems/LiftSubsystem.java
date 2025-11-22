@@ -94,6 +94,7 @@ private IMU imu;
      */
     public void setPower(double power) {
         leftMotor.setPower(power);
+        leftMotor.
         rightMotor.setPower(power);
     }
 
