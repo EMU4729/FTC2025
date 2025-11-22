@@ -60,103 +60,63 @@ public class SimpleTeleopOpMode extends OpMode {
     public void loop() {
         drive.driveRobotRelative(-gamepad2.left_stick_y, -gamepad2.left_stick_x, -gamepad2.right_stick_x);
 
-
         // for human player intake
         if (gamepad2.left_trigger > 0.5) {
-            index.setManualIndex(manualIndexerIndex);
-            index.setMode(IndexSubsystem.Mode.SHOOT_MANUAL); // switch to indexer slot
-            shooter.setSpeed(-1);
+            index.setMode(IndexSubsystem.Mode.INTAKE_MANUAL); // switch to indexer slot
+            intake.setPower(1);
         } else if (gamepad2.right_trigger <= 0.5){
-            shooter.setSpeed(0);
+            intake.setPower(0);
         }
 
-
-
-        //Rotate indexer
-        if (gamepad1.dpad_left || gamepad2.dpad_left){
+        // Rotate indexer
+        if (gamepad1.dpadLeftWasPressed() || gamepad2.dpadLeftWasPressed()){
             if (manualIndexerIndex == 0){
                 manualIndexerIndex = 2;
             } else {
                 manualIndexerIndex--;
             }
-            index.setManualIndex(manualIndexerIndex);
-            index.setMode(IndexSubsystem.Mode.SHOOT_MANUAL); // switch to indexer slot
         }
-
-        if (gamepad1.dpad_right || gamepad2.dpad_right){
+        if (gamepad1.dpadRightWasPressed() || gamepad2.dpadRightWasPressed()){
             if (manualIndexerIndex == 2){
                 manualIndexerIndex = 0;
             } else {
                 manualIndexerIndex++;
             }
-            index.setManualIndex(manualIndexerIndex);
-            index.setMode(IndexSubsystem.Mode.SHOOT_MANUAL); // switch to indexer slot
         }
+        index.setManualIndex(manualIndexerIndex);
+        telemetry.addData("Selected Indexer Slot", manualIndexerIndex);
 
-
-        // Pre-assigned index rotations
-//        if (gamepad1.dpad_left) {
-//            manualIndexerIndex = 0;
-//        } else if (gamepad1.dpad_up) {
-//            manualIndexerIndex = 1;
-//        } else if (gamepad1.dpad_right) {
-//            manualIndexerIndex = 2;
-//        }
-//        index.setManualIndex(manualIndexerIndex);
-
-//        if (gamepad1.left_trigger > 0.5) {
-//            index.setMode(IndexSubsystem.Mode.INTAKE_MANUAL);
-//            intake.setPower(1);
-//            shooter.setSpeed(0);
-//        } else if (gamepad1.right_trigger > 0.5) {
-//            index.setMode(IndexSubsystem.Mode.SHOOT_MANUAL);
-//            shooter.setSpeed(100);
-//            intake.setPower(0);
-//        } else {
-//            index.setMode(IndexSubsystem.Mode.INTAKE_MANUAL);
-//            shooter.setSpeed(0);
-//            intake.setPower(0);
-//        }
-
-
-
-        if (gamepad2.right_trigger > 0.5) {
-            triggerCooldown.reset();
-                launchState = LaunchState.SPIN_UP;
+        if (gamepad2.right_trigger > 0.5 && launchState == LaunchState.IDLE) {
+            launchState = LaunchState.SPIN_UP;
         } else if (gamepad2.right_trigger <= 0.5) {
-                launchState = LaunchState.IDLE;
+            launchState = LaunchState.IDLE;
         }
 
-            switch (launchState) {
-                case IDLE:
+        switch (launchState) {
+            case IDLE:
+                shooter.unpop();
+                break;
+
+            case SPIN_UP:
+                shooter.setSpeed(100);
+                if (shooter.getMotorSpeed() >= 60 && gamepad2.right_trigger > 0.5) {
+                    launchState = LaunchState.LAUNCHING;
+                    shootTime = timer.time();
+                }
+                break;
+
+            case LAUNCHING:
+                shooter.pop();
+                index.setMode(IndexSubsystem.Mode.SHOOT_MANUAL); // switch to indexer slot
+                if (timer.time() - shootTime > 0.5) {
                     shooter.unpop();
-                    break;
-
-                case SPIN_UP:
-                    shooter.setSpeed(1);
-                    if (shooter.atDesiredSpeed() && gamepad2.right_trigger > 0.5) {
-                        launchState = LaunchState.LAUNCHING;
-                        shootTime = timer.time();
-                    }
-                    break;
-
-                case LAUNCHING:
-                    shooter.pop();
-                    if (manualIndexerIndex == 2){
-                        manualIndexerIndex = 0;
-                    } else {
-                        manualIndexerIndex++;
-                    }
+                    manualIndexerIndex = (manualIndexerIndex + 1) % 3;
                     index.setManualIndex(manualIndexerIndex);
-                    index.setMode(IndexSubsystem.Mode.SHOOT_MANUAL); // switch to indexer slot
-                    if (timer.time() - shootTime > 0.5) {
-                        shooter.unpop();
-                        index.emptyCurrentSlot();
-                        launchState = LaunchState.SPIN_UP;
-                    }
-                    break;
+                    launchState = LaunchState.SPIN_UP;
+                }
+                break;
+        }
 
-            }
         // Raises or lowers lift
         if (gamepad1.left_bumper) {
             lift.setRightPower(-1);
