@@ -25,7 +25,7 @@ public class LocalisationSubsystem {
 
     // pitch was init'd as -90 in demo, but set to 0 here for now (-90 made no sense)
     private static final YawPitchRollAngles CAMERA_ORIENTATION = new YawPitchRollAngles(AngleUnit.DEGREES,
-            0, -90, 0, 0);
+            0, -45, 0, 0);
     private static final IndexSubsystem.Ball[][] OBELISK_PATTERNS = {
             {IndexSubsystem.Ball.GREEN, IndexSubsystem.Ball.PURPLE, IndexSubsystem.Ball.PURPLE},
             {IndexSubsystem.Ball.GREEN, IndexSubsystem.Ball.PURPLE, IndexSubsystem.Ball.PURPLE},
@@ -57,7 +57,7 @@ public class LocalisationSubsystem {
         // setup otos
         otosSensor = hardwareMap.get(SparkFunOTOS.class, "otos");
         otosSensor.setLinearUnit(DistanceUnit.METER);
-        otosSensor.setAngularUnit(AngleUnit.DEGREES);
+        otosSensor.setAngularUnit(AngleUnit.RADIANS);
         otosSensor.setOffset(OTOS_OFFSET);
         otosSensor.setLinearScalar(OTOS_LINEAR_SCALAR);
         otosSensor.setAngularScalar(OTOS_ANGULAR_SCALAR);
