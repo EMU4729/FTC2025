@@ -22,9 +22,7 @@ public class SimpleTeleopOpMode extends OpMode {
     ShooterSubsystem shooter;
 //    LEDSubsystem led;
     LocalisationSubsystem localisation;
-    boolean intakenThroughShooter = false;
     ElapsedTime triggerCooldown = new ElapsedTime();
-    ElapsedTime reversedShoot = new ElapsedTime();
     private double shootTime = 0;
     private double shooterTilt = 1;
 
@@ -64,18 +62,14 @@ public class SimpleTeleopOpMode extends OpMode {
 
 
         // for human player intake
-        if (gamepad2.left_trigger > 0.5){
+        if (gamepad2.left_trigger > 0.5) {
             index.setManualIndex(manualIndexerIndex);
             index.setMode(IndexSubsystem.Mode.SHOOT_MANUAL); // switch to indexer slot
             shooter.setSpeed(-1);
-            intakenThroughShooter = true;
-            reversedShoot.reset();
+        } else if (gamepad2.right_trigger <= 0.5){
+            shooter.setSpeed(0);
         }
 
-        if (reversedShoot.seconds() > 3 && intakenThroughShooter){
-            shooter.setSpeed(0);
-            intakenThroughShooter = false;
-        }
 
 
         //Rotate indexer
