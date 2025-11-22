@@ -115,39 +115,46 @@ public class TeleopOpMode extends OpMode {
         shooter.setTilt(shooterTilt);
 
         // Shoot state FSM
-        boolean spinUp = gamepad1.right_trigger > 0.5 || gamepad2.right_trigger > 0.5;
-        if (spinUp && shootState == ShootState.IDLE) {
+        if (gamepad2.right_trigger > 0.5 && shootState == ShootState.IDLE) {
             shootState = ShootState.PREPARING;
-        } else if (!spinUp) {
+        } else if (gamepad2.right_trigger <= 0.5) {
             shootState = ShootState.IDLE;
         }
 
-//        switch (shootState) {
-//            case IDLE:
-//                shooter.setSpeed(0);
-//                shooter.unpop();
-//                break;
-//
-//            case PREPARING:
-//                index.setMode(shootMode);
-//                shooter.setSpeed(gamepad2.y ? 0.5 : 2);
-//                if (index.atTarget() && shooter.atDesiredSpeed() && gamepad2.right_trigger > 0.5) {
-//                    shootState = ShootState.SHOOTING;
-//                    shootTime = timer.time();
-//                }
-//                break;
-//
-//            case SHOOTING:
-//                shooter.pop();
-//                shootMode = IndexSubsystem.Mode.SHOOT_ANY;
-//
-//                if (timer.time() - shootTime > 0.5) {
-//                    shooter.unpop();
-//                    index.emptyCurrentSlot();
-//                    shootState = ShootState.PREPARING;
-//                }
-//                break;
-//        }
+        if (gamepad1.right_trigger > 0.5) {
+            shooter.setSpeed(gamepad2.y ? 0.5 : 2);
+        } else {
+            shooter.setSpeed(0);
+        }
+
+        switch (shootState) {
+            case IDLE:
+                if (gamepad1.right_trigger <= 0.5) {
+                    shooter.setSpeed(0);
+                }
+                shooter.unpop();
+                break;
+
+            case PREPARING:
+                index.setMode(shootMode);
+                shooter.setSpeed(gamepad2.y ? 0.5 : 2);
+                if (index.atTarget() && shooter.atDesiredSpeed() && gamepad2.right_trigger > 0.5) {
+                    shootState = ShootState.SHOOTING;
+                    shootTime = timer.time();
+                }
+                break;
+
+            case SHOOTING:
+                shooter.pop();
+                shootMode = IndexSubsystem.Mode.SHOOT_ANY;
+
+                if (timer.time() - shootTime > 0.5) {
+                    shooter.unpop();
+                    index.emptyCurrentSlot();
+                    shootState = ShootState.PREPARING;
+                }
+                break;
+        }
 
         //Raises or lowers lift
 //        if (gamepad1.dpad_up) {
@@ -173,9 +180,9 @@ public class TeleopOpMode extends OpMode {
 
         drive.periodic();
 //        lift.periodic();
-//        intake.periodic();
-//        index.periodic();
-//        shooter.periodic();
+        intake.periodic();
+        index.periodic();
+        shooter.periodic();
 //        led.periodic();
         telemetry.update();
     }
