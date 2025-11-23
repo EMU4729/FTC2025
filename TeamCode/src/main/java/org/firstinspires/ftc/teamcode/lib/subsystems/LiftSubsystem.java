@@ -17,7 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 public class LiftSubsystem extends SubsystemBase {
     private static final double LIFT_DISTANCE_PER_TICK = 1 / 537.7;
     private static final double LIFT_PID_P = 1;
-    private static final double SYNC_P_GAIN = 0.005;
+    private static final double SYNC_P_GAIN = 0.001;
 
     private final DcMotorEx leftMotor;
     private final DcMotorEx rightMotor;
@@ -36,19 +36,6 @@ public class LiftSubsystem extends SubsystemBase {
 // Initialize IMU using Parameters
 
 
-
-        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        // Check your physical wiring to confirm which one needs reverse
-        rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        // Reset encoders so 0 is the bottom
-        leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void periodic() {
