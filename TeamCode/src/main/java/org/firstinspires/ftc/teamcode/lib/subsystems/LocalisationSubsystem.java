@@ -70,6 +70,7 @@ public class LocalisationSubsystem {
         otosSensor.setPosition(robotPose);
     }
 
+
     /**
      * @return true if the robot's pose has been initialised from a detected AprilTag, false if not
      */
@@ -93,10 +94,26 @@ public class LocalisationSubsystem {
     }
 
     private void updateTelemetry() {
-        telemetry.addData("AprilTag Positioning Complete", initialised);
-        telemetry.addData("Robot X", robotPose.x);
-        telemetry.addData("Robot Y", robotPose.y);
-        telemetry.addData("Robot Heading (deg)", Math.toDegrees(robotPose.h));
+        if (aprilTag.getDetections().size() > 0) {
+            // Get the first detection from the list.
+            AprilTagDetection detection = aprilTag.getDetections().get(0);
+
+            // IMPORTANT: Check if the pose data is available for this detection.
+            if (detection.ftcPose != null) {
+                // If the pose data is not null, then you can safely access its fields.
+                telemetry.addData("x", detection.ftcPose.x);
+                telemetry.addData("y", detection.ftcPose.y);
+                telemetry.addData("z", detection.ftcPose.z);
+                telemetry.addData("roll", detection.ftcPose.roll);
+                telemetry.addData("pitch", detection.ftcPose.pitch);
+                telemetry.addData("yaw", detection.ftcPose.yaw);
+            }
+        }
+        else{
+            aprilTag.getFreshDetections();
+        }
+        // Update the telemetry on the Driver Station.
+        telemetry.update();
     }
 
     public void periodic() {
