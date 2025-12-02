@@ -51,6 +51,12 @@ public class BackupShootAuto extends OpMode {
                 shooter.unpop();
             } while (timer.time() - unpopTime < 0.2);
         }
+
+        driveTime = timer.time();
+        while (timer.time() - driveTime < 0.2){
+            drive.driveRobotRelative(0, 0.5, 0);
+        }
+        drive.stop();
     }
 
     @Override
