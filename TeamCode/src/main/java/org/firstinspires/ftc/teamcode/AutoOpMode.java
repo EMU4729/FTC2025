@@ -60,6 +60,7 @@ public class AutoOpMode extends OpMode {
                     drive.stop();
                     state = State.INITIALISING_OTOS;
                 }
+                break;
             case INITIALISING_OTOS:
                 if (localisation.isInitialised()) state = State.MOVING_TO_SHOOT_POSITION;
                 break;
