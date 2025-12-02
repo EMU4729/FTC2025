@@ -72,8 +72,8 @@ public class LocalisationSubsystem {
 
         imu = hardwareMap.get(IMU.class, "imu");
         imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD,
-                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
+                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
         )));
     }
 
@@ -108,38 +108,38 @@ public class LocalisationSubsystem {
 
     private void updateTelemetry() {
         telemetry.addData("AprilTag Positioning Complete", initialised);
-        telemetry.addData("Robot X", robotPose.x);
-        telemetry.addData("Robot Y", robotPose.y);
-        telemetry.addData("Robot Heading (deg)", Math.toDegrees(robotPose.h));
+        telemetry.addData("Robot Pose", robotPose.toString());
+        telemetry.addData("Robot Pose (OTOS)", otosSensor.getPosition().toString());
+        telemetry.addData("OTOS Connected?", otosSensor.isConnected());
     }
 
     public void periodic() {
         updateTelemetry();
+        robotPose = otosSensor.getPosition();
 
-        if (!initialised) {
-            List<AprilTagDetection> freshDetections = aprilTag.getFreshDetections();
+        // early return if we don't need to do apriltag stuff anymore
+        if (initialised && obeliskId != -1) return;
 
-            if (freshDetections.isEmpty()) return;
+        List<AprilTagDetection> freshDetections = aprilTag.getFreshDetections();
+        if (freshDetections == null || freshDetections.isEmpty()) return;
 
-            for (AprilTagDetection detection : freshDetections) {
-                // handle obelisk tags
-                if (detection.metadata.id >= 21 && detection.metadata.id <= 23) {
-                    if (obeliskId == -1) obeliskId = detection.metadata.id;
-                    continue;
-                }
+        for (AprilTagDetection detection : freshDetections) {
+            // handle obelisk tags
+            if (detection.metadata.id >= 21 && detection.metadata.id <= 23) {
+                if (obeliskId == -1) obeliskId = detection.metadata.id;
+                continue;
+            }
 
+            // handle localisation initialisation
+            if (!initialised) {
                 robotPose = new SparkFunOTOS.Pose2D(
                         detection.robotPose.getPosition().x,
                         detection.robotPose.getPosition().y,
                         detection.robotPose.getOrientation().getYaw(AngleUnit.RADIANS)
                 );
+                otosSensor.setPosition(robotPose);
                 initialised = true;
             }
-
-            // only update otos position if a non-obelisk apriltag was detected
-            if (initialised) otosSensor.setPosition(robotPose);
         }
-
-        robotPose = otosSensor.getPosition();
     }
 }

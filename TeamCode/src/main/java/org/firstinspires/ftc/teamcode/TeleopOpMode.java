@@ -185,6 +185,7 @@ public class TeleopOpMode extends OpMode {
         intake.periodic();
         index.periodic();
         shooter.periodic();
+        localisation.periodic();
 //        led.periodic();
         telemetry.update();
     }
