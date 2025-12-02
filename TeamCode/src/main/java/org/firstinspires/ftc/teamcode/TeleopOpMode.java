@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.lib.subsystems.ShooterSubsystem;
 
 @TeleOp(name = "TeleOp")
 public class TeleopOpMode extends OpMode {
-    private static final boolean DISABLE_COLOR_SENSOR = true;
+    private static final boolean DISABLE_COLOR_SENSOR = false;
 
     DriveSubsystem drive;
     LiftSubsystem lift;
@@ -160,13 +160,17 @@ public class TeleopOpMode extends OpMode {
                 break;
         }
 
-        //Raises or lowers lift
-        if (gamepad1.dpad_up) {
-            lift.setPower(1);
-        } else if (gamepad1.dpad_down) {
-            lift.setPower(-1);
+        // Raises or lowers lift
+        if (gamepad1.left_bumper) {
+            lift.setRightPower(-1);
         } else {
-            lift.setPower(0);
+            lift.setRightPower(0);
+        }
+
+        if (gamepad1.right_bumper) {
+            lift.setLeftPower(-1);
+        } else {
+            lift.setLeftPower(0);
         }
 
         // alternative ball detection implementation based on detecting current spike in the intake
