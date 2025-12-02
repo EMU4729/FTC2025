@@ -31,18 +31,23 @@ public class ShooterSubsystem extends SubsystemBase {
     /**
      * sets shooting motor to a given velocity
      *
-     * @param vel the target velocity of the shooter in ticks/second
+     * @param vel the target velocity of the shooter in rps
      */
     public void setSpeed(double vel) {
-//         motor.setPower(vel);
         motor.setVelocity(vel * TICKS_PER_SHOOTER_ROTATION);
         this.vel = vel;
     }
 
+    /**
+     * @return The current motor speed, in rps
+     */
     public double getMotorSpeed() {
         return motor.getVelocity() / TICKS_PER_SHOOTER_ROTATION;
     }
 
+    /**
+     * @return true if the motor is at the desired speed, false if not
+     */
     public boolean atDesiredSpeed() {
         return Math.abs(vel - getMotorSpeed()) < 0.1;
     }

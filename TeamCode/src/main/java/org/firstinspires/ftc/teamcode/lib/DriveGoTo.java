@@ -23,6 +23,12 @@ public class DriveGoTo {
         this.target = target;
     }
 
+    /**
+     * Calculates the error of the current robot pose from the target
+     *
+     * @param robotPose The current robot pose
+     * @return The error between the current robot pose and the target robot pose
+     */
     private SparkFunOTOS.Pose2D getError(SparkFunOTOS.Pose2D robotPose) {
         return new SparkFunOTOS.Pose2D(
                 target.x - robotPose.x,
@@ -30,6 +36,9 @@ public class DriveGoTo {
                 target.h - robotPose.h);
     }
 
+    /**
+     * Main looping logic for DriveGoTo. Should be called repeatedly until {@link DriveGoTo#atTarget()} returns true.
+     */
     public void execute() {
         SparkFunOTOS.Pose2D robotPose = localisation.getPose();
         SparkFunOTOS.Pose2D error = getError(robotPose);
@@ -44,6 +53,9 @@ public class DriveGoTo {
         drive.driveFieldRelative(outputX, outputY, outputR, robotPose.h);
     }
 
+    /**
+     * @return true if the robot is within an acceptable error of the target position.
+     */
     public boolean atTarget() {
         SparkFunOTOS.Pose2D robotPose = localisation.getPose();
         SparkFunOTOS.Pose2D error = getError(robotPose);

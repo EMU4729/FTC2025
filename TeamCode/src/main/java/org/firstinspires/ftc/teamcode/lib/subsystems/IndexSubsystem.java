@@ -76,6 +76,11 @@ public class IndexSubsystem extends SubsystemBase {
         setGain(COLOR_SENSOR_GAIN);
     }
 
+    /**
+     * Sets the slot index to rotate to in the intake and shooting manual modes
+     *
+     * @param index The slot index to go to
+     */
     public void setManualIndex(int index) {
         manualIndex = index;
     }
@@ -323,8 +328,8 @@ public class IndexSubsystem extends SubsystemBase {
             return;
         }
 
+        // TODO: to speed this up, consider PID
         double error = wrappedSignedAngleBetween(rotation, rotations[closestSlotIndex]);
-        telemetry.addData("index error", error);
         if (error > 0.1) {
             servo.setPosition(0.45);
         } else if (error < -0.1) {

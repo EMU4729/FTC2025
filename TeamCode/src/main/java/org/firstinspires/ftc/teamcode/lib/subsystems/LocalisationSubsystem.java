@@ -2,8 +2,10 @@ package org.firstinspires.ftc.teamcode.lib.subsystems;
 
 import android.util.Size;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -31,18 +33,17 @@ public class LocalisationSubsystem {
             {IndexSubsystem.Ball.GREEN, IndexSubsystem.Ball.PURPLE, IndexSubsystem.Ball.PURPLE},
             {IndexSubsystem.Ball.GREEN, IndexSubsystem.Ball.PURPLE, IndexSubsystem.Ball.PURPLE},
     };
-    private final HardwareMap hardwareMap;
     private final Telemetry telemetry;
     private final SparkFunOTOS otosSensor;
     private final AprilTagProcessor aprilTag;
     private final VisionPortal visionPortal;
     private SparkFunOTOS.Pose2D robotPose = new SparkFunOTOS.Pose2D();
+    private final IMU imu;
     private boolean initialised = false;
     private int obeliskId = -1;
 
     public LocalisationSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
-        this.hardwareMap = hardwareMap;
 
         // setup vision
         aprilTag = new AprilTagProcessor.Builder()
@@ -68,6 +69,19 @@ public class LocalisationSubsystem {
 
         // starting position, will be updated by april tag positioning.
         otosSensor.setPosition(robotPose);
+
+        imu = hardwareMap.get(IMU.class, "imu");
+        imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD,
+                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
+        )));
+    }
+
+    /**
+     * @return The yaw, pitch and roll angles, as reported by the IMU.
+     */
+    public YawPitchRollAngles getIMUAngles() {
+        return imu.getRobotYawPitchRollAngles();
     }
 
     /**

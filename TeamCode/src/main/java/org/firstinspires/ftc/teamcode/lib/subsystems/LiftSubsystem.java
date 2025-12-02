@@ -15,10 +15,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public class LiftSubsystem extends SubsystemBase {
-    private static final double LIFT_DISTANCE_PER_TICK = 1 / 537.7;
-    private static final double LIFT_PID_P = 1;
-    private static final double SYNC_P_GAIN = 0.001;
-
     private final DcMotorEx leftMotor;
     private final DcMotorEx rightMotor;
     private final Telemetry telemetry;
@@ -31,59 +27,33 @@ public class LiftSubsystem extends SubsystemBase {
         rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         this.telemetry = telemetry;
-
-
-// Initialize IMU using Parameters
-
-
-    }
-
-    public void periodic() {
-        telemetry.addData("Lift Left Conn", leftMotor.getConnectionInfo());
-        telemetry.addData("Lift Right Conn", leftMotor.getConnectionInfo());
-
-
-
-
-
-    }
-    private double clamp(double val) {
-        return Math.max(-1.0, Math.min(1.0, val));
     }
 
     /**
      * Directly sets the power of the lift motors.
      *
-     * @param targetPower The power in the range [-1, 1]
+     * @param power The power in the range [-1, 1]
      */
-    public void setPower(double targetPower) {
-        // Get positions
-        int leftPos = leftMotor.getCurrentPosition();
-        int rightPos = rightMotor.getCurrentPosition();
-
-        // Calculate difference (Error)
-        // If left is at 1000 and right is at 800, error is 200.
-        int error = leftPos - rightPos;
-
-        // Calculate correction
-        // If left is higher (positive error), we subtract power from left (or add to right).
-        double correction = error * SYNC_P_GAIN;
-
-        // Apply power with correction
-        // We restrain the values to ensure they don't exceed +/- 1.0
-        double leftPower = targetPower - correction;
-        double rightPower = targetPower + correction;
-
-        // Safety clamp
-        leftMotor.setPower(clamp(leftPower));
-        rightMotor.setPower(clamp(rightPower));
+    public void setPower(double power) {
+        setLeftPower(power);
+        setRightPower(power);
     }
 
 
+    /**
+     * Sets the power of the left lift motor.
+     *
+     * @param power The power in the range [-1, 1]
+     */
     public void setLeftPower(double power) {
         leftMotor.setPower(power);
     }
 
+    /**
+     * Sets the power of the right lift motor.
+     *
+     * @param power The power in the range [-1, 1]
+     */
     public void setRightPower(double power) {
         rightMotor.setPower(power);
     }

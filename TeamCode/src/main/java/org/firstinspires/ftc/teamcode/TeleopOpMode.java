@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.lib.LiftRaise;
 import org.firstinspires.ftc.teamcode.lib.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.IndexSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.IntakeSubsystem;
@@ -15,13 +16,13 @@ import org.firstinspires.ftc.teamcode.lib.subsystems.ShooterSubsystem;
 public class TeleopOpMode extends OpMode {
     private static final boolean DISABLE_COLOR_SENSOR = false;
 
-    DriveSubsystem drive;
-    LiftSubsystem lift;
-    IntakeSubsystem intake;
-    IndexSubsystem index;
-    ShooterSubsystem shooter;
-//    LEDSubsystem led;
-    LocalisationSubsystem localisation;
+    private DriveSubsystem drive;
+    private LiftSubsystem lift;
+    private IntakeSubsystem intake;
+    private IndexSubsystem index;
+    private ShooterSubsystem shooter;
+    private LocalisationSubsystem localisation;
+    private LiftRaise liftRaiseCommand;
 
     private enum ShootState {
         IDLE,
@@ -53,6 +54,7 @@ public class TeleopOpMode extends OpMode {
         shooter = new ShooterSubsystem(hardwareMap, telemetry);
 //        led = new LEDSubsystem(hardwareMap, telemetry);
         localisation = new LocalisationSubsystem(hardwareMap, telemetry);
+        liftRaiseCommand = new LiftRaise(localisation, lift);
     }
 
     @Override
@@ -161,16 +163,10 @@ public class TeleopOpMode extends OpMode {
         }
 
         // Raises or lowers lift
-        if (gamepad1.left_bumper) {
-            lift.setRightPower(-1);
-        } else {
-            lift.setRightPower(0);
-        }
-
-        if (gamepad1.right_bumper) {
-            lift.setLeftPower(-1);
-        } else {
-            lift.setLeftPower(0);
+        if (gamepad2.right_bumper) {
+            liftRaiseCommand.execute();
+        } else if (gamepad2.rightBumperWasReleased()) {
+            liftRaiseCommand.end();
         }
 
         // alternative ball detection implementation based on detecting current spike in the intake
