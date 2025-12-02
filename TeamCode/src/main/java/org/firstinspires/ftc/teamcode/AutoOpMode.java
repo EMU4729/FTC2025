@@ -11,8 +11,6 @@ import org.firstinspires.ftc.teamcode.lib.subsystems.IndexSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.LocalisationSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.ShooterSubsystem;
 
-import java.util.concurrent.TimeUnit;
-
 @Autonomous(name = "Auto")
 public class AutoOpMode extends OpMode {
     private DriveSubsystem drive;
