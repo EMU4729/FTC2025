@@ -41,7 +41,6 @@ public class TeleopOpMode extends OpMode {
     private IndexSubsystem.Mode shootMode = IndexSubsystem.Mode.SHOOT_ANY;
     private final ElapsedTime timer = new ElapsedTime();
     private double shootTime = 0;
-    private double shooterTilt = 0;
     private double intakeTime = 0;
     private boolean intakenRecently = false;
 
@@ -114,11 +113,10 @@ public class TeleopOpMode extends OpMode {
 
         // Shooter arc control
         if (gamepad2.dpad_up) {
-            shooterTilt += 0.05;
+            shooter.setTilt(shooter.getTilt() + 0.05);
         } else if (gamepad2.dpad_down) {
-            shooterTilt -= 0.05;
+            shooter.setTilt(shooter.getTilt() - 0.05);
         }
-        shooter.setTilt(shooterTilt);
 
         // Shoot state FSM
         if (gamepad2.right_trigger > 0.5 && shootState == ShootState.IDLE) {

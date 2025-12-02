@@ -62,6 +62,13 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     /**
+     * @return The commanded position of the tilt servo
+     */
+    public double getTilt() {
+        return tiltServo.getPosition();
+    }
+
+    /**
      * Pops the ball into the shooter
      */
     public void pop() {
