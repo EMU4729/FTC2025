@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.lib.subsystems;
 import android.graphics.Color;
 
 import com.qualcomm.robotcore.hardware.AnalogInput;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
@@ -165,7 +163,7 @@ public class IndexSubsystem extends SubsystemBase {
      */
     public boolean atTarget() {
         // we ignore `atTarget` if we are not in a "smart" mode
-        return (mode == Mode.INTAKE || mode == Mode.SHOOT_ANY || mode == Mode.SHOOT_GREEN_ONLY || mode == Mode.SHOOT_PURPLE_ONLY) && atTarget;
+        return (mode == Mode.INTAKE || mode == Mode.SHOOT_ANY || mode == Mode.SHOOT_GREEN_ONLY || mode == Mode.SHOOT_PURPLE_ONLY || mode == Mode.INTAKE_MANUAL || mode == Mode.SHOOT_MANUAL) && atTarget;
     }
 
     /**
