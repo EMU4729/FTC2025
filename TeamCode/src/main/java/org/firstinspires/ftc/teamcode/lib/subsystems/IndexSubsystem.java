@@ -32,10 +32,10 @@ public class IndexSubsystem extends SubsystemBase {
     }
 
     private static final float COLOR_SENSOR_GAIN = 1; // TODO: tune
-    private static final float[] PURPLE_MIN_HSV = new float[]{0, 0, 0}; // TODO: tune
-    private static final float[] PURPLE_MAX_HSV = new float[]{0, 0, 0}; // TODO: tune
-    private static final float[] GREEN_MIN_HSV = new float[]{0, 0, 0}; // TODO: tune
-    private static final float[] GREEN_MAX_HSV = new float[]{0, 0, 0}; // TODO: tune
+    private static final float[] PURPLE_MIN_HSV = new float[]{220, 0.3f, 0}; // TODO: tune
+    private static final float[] PURPLE_MAX_HSV = new float[]{240, 1, 0.1f}; // TODO: tune
+    private static final float[] GREEN_MIN_HSV = new float[]{160, 0.5f, 0}; // TODO: tune
+    private static final float[] GREEN_MAX_HSV = new float[]{180, 1, 1}; // TODO: tune
 
     private static final double[] INTAKE_ROTATIONS = new double[]{Math.toRadians(115), Math.toRadians(235), Math.toRadians(2)}; // TODO: tune
     private static final double[] SHOOT_ROTATIONS = new double[]{Math.toRadians(304), Math.toRadians(60), Math.toRadians(182)}; // TODO: tune
@@ -73,7 +73,6 @@ public class IndexSubsystem extends SubsystemBase {
         // yes, this is officially how you switch on the led on a color sensor with a switchable led
         // yes, i hate it too
         if (colorSensor instanceof SwitchableLight) {
-            telemetry.addData("Clor sensor switchlight", true);
             ((SwitchableLight) (colorSensor)).enableLight(true);
         }
         setGain(COLOR_SENSOR_GAIN);
@@ -256,6 +255,9 @@ public class IndexSubsystem extends SubsystemBase {
         telemetry.addData("Indexer Color Sensor Raw", colorSensor.getNormalizedColors().toColor());
         telemetry.addData("Indexer Color Sensor Conn Info", colorSensor.getConnectionInfo());
         telemetry.addData("Indexer Manual Index", manualIndex);
+        telemetry.addData("Indexer Storage", String.format("(%s, %s, %s)", storage[0], storage[1], storage[2]));
+        telemetry.addData("Indexer Detecting Green", hsvInRange(getHSV(), GREEN_MIN_HSV, GREEN_MAX_HSV));
+        telemetry.addData("Indexer Detecting Purple", hsvInRange(getHSV(), PURPLE_MIN_HSV, PURPLE_MAX_HSV));
     }
 
     /**
