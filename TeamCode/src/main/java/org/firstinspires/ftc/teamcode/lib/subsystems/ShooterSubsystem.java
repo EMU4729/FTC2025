@@ -86,6 +86,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public void periodic() {
         telemetry.addData("Shooter Speed (rps)", getMotorSpeed());
         telemetry.addData("Shooter Desired Speed (rps)", vel);
+        telemetry.addData("Shooter Tilt", tiltServo.getPosition());
         telemetry.addData("Shooter At Target Speed", atDesiredSpeed());
     }
 }
