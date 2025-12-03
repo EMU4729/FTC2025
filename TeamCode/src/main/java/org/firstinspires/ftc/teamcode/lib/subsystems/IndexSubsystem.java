@@ -47,7 +47,8 @@ public class IndexSubsystem extends SubsystemBase {
     private final Telemetry telemetry;
     private final Servo servo;
     private final AnalogInput encoder;
-    private final NormalizedColorSensor colorSensor;
+    private final NormalizedColorSensor sideColorSensor;
+    private final NormalizedColorSensor topColorSensor;
     private final Ball[] storage = new Ball[]{Ball.EMPTY, Ball.EMPTY, Ball.EMPTY};
     private final boolean disableColorSensor;
     private Mode mode = Mode.IDLE;
@@ -66,12 +67,16 @@ public class IndexSubsystem extends SubsystemBase {
         servo = hardwareMap.get(Servo.class, "indexServo");
         servo.setDirection(Servo.Direction.REVERSE);
         encoder = hardwareMap.get(AnalogInput.class, "indexEncoder");
-        colorSensor = hardwareMap.get(NormalizedColorSensor.class, "indexColorSensor");
+        topColorSensor = hardwareMap.get(NormalizedColorSensor.class, "indexTopColorSensor");
+        sideColorSensor = hardwareMap.get(NormalizedColorSensor.class, "indexSideColorSensor");
 
         // yes, this is officially how you switch on the led on a color sensor with a switchable led
         // yes, i hate it too
-        if (colorSensor instanceof SwitchableLight) {
-            ((SwitchableLight) (colorSensor)).enableLight(true);
+        if (sideColorSensor instanceof SwitchableLight) {
+            ((SwitchableLight) (topColorSensor)).enableLight(true);
+        }
+        if (topColorSensor instanceof SwitchableLight) {
+            ((SwitchableLight) (topColorSensor)).enableLight(true);
         }
         setGain(COLOR_SENSOR_GAIN);
     }
@@ -123,22 +128,34 @@ public class IndexSubsystem extends SubsystemBase {
      * @param gain The new gain of the colour sensor.
      */
     public void setGain(float gain) {
-        colorSensor.setGain(gain);
+        topColorSensor.setGain(gain);
+        sideColorSensor.setGain(gain);
     }
 
     /**
      * @return the current gain setting of the colour sensor.
      */
     public float getGain() {
-        return colorSensor.getGain();
+        return topColorSensor.getGain();
     }
 
     /**
-     * @return The current HSV reading from the color sensor as a 3-length float array.
+     * @return The current HSV reading from the top color sensor as a 3-length float array.
      * Element 0 is hue in the range [0, 360), element 1 is saturation in the range [0, 1], and element 2 is value in the range [0, 1].
      */
-    public float[] getHSV() {
-        NormalizedRGBA rgba = colorSensor.getNormalizedColors();
+    public float[] getTopHSV() {
+        NormalizedRGBA rgba = topColorSensor.getNormalizedColors();
+        float[] hsv = new float[]{0, 0, 0};
+        Color.colorToHSV(rgba.toColor(), hsv);
+        return hsv;
+    }
+
+    /**
+     * @return The current HSV reading from the side color sensor as a 3-length float array.
+     * Element 0 is hue in the range [0, 360), element 1 is saturation in the range [0, 1], and element 2 is value in the range [0, 1].
+     */
+    public float[] getSideHSV() {
+        NormalizedRGBA rgba = sideColorSensor.getNormalizedColors();
         float[] hsv = new float[]{0, 0, 0};
         Color.colorToHSV(rgba.toColor(), hsv);
         return hsv;
@@ -241,11 +258,12 @@ public class IndexSubsystem extends SubsystemBase {
      */
     private void detectEnteringBalls(int slotIndex) {
         if (disableColorSensor) return;
-        float[] hsv = getHSV();
-        if (hsvInRange(hsv, GREEN_MIN_HSV, GREEN_MAX_HSV)) {
+        float[] topHsv = getTopHSV();
+        float[] sideHsv = getSideHSV();
+        if (hsvInRange(topHsv, GREEN_MIN_HSV, GREEN_MAX_HSV) || hsvInRange(sideHsv, GREEN_MIN_HSV, GREEN_MAX_HSV)) {
             storage[slotIndex] = Ball.GREEN;
             ballRecentlyIntaken = true;
-        } else if (hsvInRange(hsv, PURPLE_MIN_HSV, PURPLE_MAX_HSV)) {
+        } else if (hsvInRange(topHsv, PURPLE_MIN_HSV, PURPLE_MAX_HSV) || hsvInRange(sideHsv, PURPLE_MIN_HSV, PURPLE_MAX_HSV)) {
             storage[slotIndex] = Ball.PURPLE;
             ballRecentlyIntaken = true;
         }
@@ -259,12 +277,15 @@ public class IndexSubsystem extends SubsystemBase {
         telemetry.addData("Indexer Setpoint", servo.getPosition());
         telemetry.addData("Indexer At Target", atTarget());
         telemetry.addData("Indexer Mode", mode);
-        telemetry.addData("Indexer Color Sensor Raw", colorSensor.getNormalizedColors().toColor());
-        telemetry.addData("Indexer Color Sensor Conn Info", colorSensor.getConnectionInfo());
+        telemetry.addData("Indexer Top Color Sensor HSV", getTopHSV());
+        telemetry.addData("Indexer Side Color Sensor HSV", getSideHSV());
+        telemetry.addData("Indexer Color Sensor Conn Info", topColorSensor.getConnectionInfo());
         telemetry.addData("Indexer Manual Index", manualIndex);
         telemetry.addData("Indexer Storage", String.format("(%s, %s, %s)", storage[0], storage[1], storage[2]));
-        telemetry.addData("Indexer Detecting Green", hsvInRange(getHSV(), GREEN_MIN_HSV, GREEN_MAX_HSV));
-        telemetry.addData("Indexer Detecting Purple", hsvInRange(getHSV(), PURPLE_MIN_HSV, PURPLE_MAX_HSV));
+        telemetry.addData("Indexer Detecting Green (Top)", hsvInRange(getTopHSV(), GREEN_MIN_HSV, GREEN_MAX_HSV));
+        telemetry.addData("Indexer Detecting Purple (Top)", hsvInRange(getTopHSV(), PURPLE_MIN_HSV, PURPLE_MAX_HSV));
+        telemetry.addData("Indexer Detecting Green (Side)", hsvInRange(getSideHSV(), GREEN_MIN_HSV, GREEN_MAX_HSV));
+        telemetry.addData("Indexer Detecting Purple (Side)", hsvInRange(getSideHSV(), PURPLE_MIN_HSV, PURPLE_MAX_HSV));
     }
 
     /**
@@ -283,9 +304,7 @@ public class IndexSubsystem extends SubsystemBase {
         // TODO: figure out what to do with these
         switch (mode) {
             case IDLE:
-                return;
             case CLOCKWISE:
-                return;
             case ANTICLOCKWISE:
                 return;
         }
