@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.lib;
 
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.lib.subsystems.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.LocalisationSubsystem;
@@ -8,13 +10,24 @@ public class LiftRaise {
     private static final double SYNC_P = 1;
     private final LocalisationSubsystem localisation;
     private final LiftSubsystem lift;
+    private final ElapsedTime timer = new ElapsedTime();
 
     public LiftRaise(LocalisationSubsystem localisation, LiftSubsystem lift) {
         this.localisation = localisation;
         this.lift = lift;
     }
 
+    public void start() {
+        timer.reset();
+    }
+
     public void execute() {
+        // unlock lift for the first 0.5s
+        if (timer.time() < 0.5) {
+            lift.setLockPosition(0);
+            return;
+        }
+
         // Get positions
         double roll = localisation.getIMUAngles().getRoll(AngleUnit.RADIANS);
 

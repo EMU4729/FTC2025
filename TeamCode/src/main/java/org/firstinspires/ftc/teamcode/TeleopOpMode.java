@@ -161,7 +161,9 @@ public class TeleopOpMode extends OpMode {
         }
 
         // Raises or lowers lift
-        if (gamepad2.right_bumper) {
+        if (gamepad2.rightBumperWasPressed()) {
+            liftRaiseCommand.start();
+        } else if (gamepad2.right_bumper) {
             liftRaiseCommand.execute();
         } else if (gamepad2.rightBumperWasReleased()) {
             liftRaiseCommand.end();

@@ -24,8 +24,7 @@ public class LiftSubsystem extends SubsystemBase {
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        leftLock.setPosition(1);
-        rightLock.setPosition(1);
+        setLockPosition(1);
 
         this.telemetry = telemetry;
     }
@@ -40,6 +39,11 @@ public class LiftSubsystem extends SubsystemBase {
         setRightPower(power);
     }
 
+    /**
+     * Sets the position of the locking servos.
+     *
+     * @param position The position to set the servos to.
+     */
     public void setLockPosition(double position) {
         leftLock.setPosition(position);
         rightLock.setPosition(position);
@@ -51,7 +55,6 @@ public class LiftSubsystem extends SubsystemBase {
      * @param power The power in the range [-1, 1]
      */
     public void setLeftPower(double power) {
-        leftLock.setPosition(0);
         leftMotor.setPower(power);
     }
 
@@ -61,7 +64,6 @@ public class LiftSubsystem extends SubsystemBase {
      * @param power The power in the range [-1, 1]
      */
     public void setRightPower(double power) {
-        leftLock.setPosition(0);
         rightMotor.setPower(power);
     }
 }

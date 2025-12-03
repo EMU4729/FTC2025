@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.lib.LiftRaise;
 import org.firstinspires.ftc.teamcode.lib.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.IndexSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.IntakeSubsystem;
@@ -15,14 +16,14 @@ import org.firstinspires.ftc.teamcode.lib.subsystems.ShooterSubsystem;
 public class SimpleTeleopOpMode extends OpMode {
     private static final boolean DISABLE_COLOR_SENSOR = true;
 
-    DriveSubsystem drive;
-    LiftSubsystem lift;
-    IntakeSubsystem intake;
-    IndexSubsystem index;
-    ShooterSubsystem shooter;
-    //    LEDSubsystem led;
-    LocalisationSubsystem localisation;
-    ElapsedTime triggerCooldown = new ElapsedTime();
+    private DriveSubsystem drive;
+    private LiftSubsystem lift;
+    private IntakeSubsystem intake;
+    private IndexSubsystem index;
+    private ShooterSubsystem shooter;
+    // private LEDSubsystem led;
+    private LocalisationSubsystem localisation;
+    private LiftRaise liftRaiseCommand;
     private double shootTime = 0;
     private double shooterTilt = 1;
 
@@ -48,6 +49,7 @@ public class SimpleTeleopOpMode extends OpMode {
         index = new IndexSubsystem(hardwareMap, telemetry, DISABLE_COLOR_SENSOR);
         shooter = new ShooterSubsystem(hardwareMap, telemetry);
         localisation = new LocalisationSubsystem(hardwareMap, telemetry);
+        liftRaiseCommand = new LiftRaise(localisation, lift);
         launchState = LaunchState.IDLE;
     }
 
@@ -125,17 +127,13 @@ public class SimpleTeleopOpMode extends OpMode {
                 break;
         }
 
-        // Raises or lowers lift
-        if (gamepad1.left_bumper) {
-            lift.setRightPower(-1);
-        } else {
-            lift.setRightPower(0);
-        }
-
-        if (gamepad1.right_bumper) {
-            lift.setLeftPower(-1);
-        } else {
-            lift.setLeftPower(0);
+        // lift control
+        if (gamepad1.rightBumperWasPressed()) {
+            liftRaiseCommand.start();
+        } else if (gamepad1.right_bumper) {
+            liftRaiseCommand.execute();
+        } else if (gamepad1.rightBumperWasReleased()) {
+            liftRaiseCommand.end();
         }
 
         // Shooter arc control
