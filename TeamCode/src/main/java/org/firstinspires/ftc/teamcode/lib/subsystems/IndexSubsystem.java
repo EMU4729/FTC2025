@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.lib.PIDController;
 
 import java.util.function.Function;
 
@@ -36,7 +37,8 @@ public class IndexSubsystem extends SubsystemBase {
     private static final float[] GREEN_MAX_HSV = new float[]{180, 1, 1}; // TODO: tune
 
     private static final double[] INTAKE_ROTATIONS = new double[]{Math.toRadians(115), Math.toRadians(235), Math.toRadians(2)}; // TODO: tune
-    private static final double[] SHOOT_ROTATIONS = new double[]{Math.toRadians(304), Math.toRadians(60), Math.toRadians(182)}; // TODO: tune
+    private static final double[] SHOOT_ROTATIONS = new double[]{Math.toRadians(280), Math.toRadians(40), Math.toRadians(162)}; // TODO: tune
+    private final PIDController controller = new PIDController(0.08, 0, 0, 0);
 
     public enum Ball {
         GREEN,
@@ -82,6 +84,7 @@ public class IndexSubsystem extends SubsystemBase {
      * @param index The slot index to go to
      */
     public void setManualIndex(int index) {
+        controller.resetIntegral();
         manualIndex = index;
     }
 
@@ -161,6 +164,7 @@ public class IndexSubsystem extends SubsystemBase {
      */
     public void setMode(Mode newMode) {
         mode = newMode;
+        controller.resetIntegral();
     }
 
     /**
@@ -328,15 +332,9 @@ public class IndexSubsystem extends SubsystemBase {
             return;
         }
 
-        // TODO: to speed this up, consider PID
-        double error = wrappedSignedAngleBetween(rotation, rotations[closestSlotIndex]);
-        if (error > 0.1) {
-            servo.setPosition(0.45);
-        } else if (error < -0.1) {
-            servo.setPosition(0.55);
-        } else {
-            servo.setPosition(0.5);
-        }
-        atTarget = Math.abs(error) < 0.1;
+        double error = -wrappedSignedAngleBetween(rotation, rotations[closestSlotIndex]);
+        telemetry.addData("Indexer Error", error);
+        servo.setPosition(0.5 + controller.calculate(error));
+        atTarget = Math.abs(error) < 0.05;
     }
 }

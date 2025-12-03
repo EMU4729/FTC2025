@@ -20,7 +20,7 @@ public class SimpleTeleopOpMode extends OpMode {
     IntakeSubsystem intake;
     IndexSubsystem index;
     ShooterSubsystem shooter;
-//    LEDSubsystem led;
+    //    LEDSubsystem led;
     LocalisationSubsystem localisation;
     ElapsedTime triggerCooldown = new ElapsedTime();
     private double shootTime = 0;
@@ -30,11 +30,12 @@ public class SimpleTeleopOpMode extends OpMode {
     private enum LaunchState {
         IDLE,
         SPIN_UP,
-        LAUNCHING,
+        HOLDING,
+        POPPING,
+        UNPOPPING,
     }
 
     private LaunchState launchState;
-
 
 
     private final ElapsedTime timer = new ElapsedTime();
@@ -64,20 +65,20 @@ public class SimpleTeleopOpMode extends OpMode {
         if (gamepad2.left_trigger > 0.5) {
             index.setMode(IndexSubsystem.Mode.INTAKE_MANUAL); // switch to indexer slot
             intake.setPower(1);
-        } else if (gamepad2.right_trigger <= 0.5){
+        } else if (gamepad2.right_trigger <= 0.5) {
             intake.setPower(0);
         }
 
         // Rotate indexer
-        if (gamepad1.dpadLeftWasPressed() || gamepad2.dpadLeftWasPressed()){
-            if (manualIndexerIndex == 0){
+        if (gamepad1.dpadLeftWasPressed() || gamepad2.dpadLeftWasPressed()) {
+            if (manualIndexerIndex == 0) {
                 manualIndexerIndex = 2;
             } else {
                 manualIndexerIndex--;
             }
         }
-        if (gamepad1.dpadRightWasPressed() || gamepad2.dpadRightWasPressed()){
-            if (manualIndexerIndex == 2){
+        if (gamepad1.dpadRightWasPressed() || gamepad2.dpadRightWasPressed()) {
+            if (manualIndexerIndex == 2) {
                 manualIndexerIndex = 0;
             } else {
                 manualIndexerIndex++;
@@ -94,22 +95,39 @@ public class SimpleTeleopOpMode extends OpMode {
 
         switch (launchState) {
             case IDLE:
+                shooter.setSpeed(0);
                 shooter.unpop();
                 break;
 
             case SPIN_UP:
                 shooter.setSpeed(100);
-                if (shooter.getMotorSpeed() >= 60 && gamepad2.right_trigger > 0.5) {
-                    launchState = LaunchState.LAUNCHING;
+                index.setMode(IndexSubsystem.Mode.SHOOT_MANUAL); // switch to indexer slot
+                if (shooter.getMotorSpeed() >= 60 && gamepad2.right_trigger > 0.5 && index.atTarget()) {
+                    launchState = LaunchState.HOLDING;
                     shootTime = timer.time();
                 }
                 break;
 
-            case LAUNCHING:
+            case HOLDING:
+                if (shooter.getMotorSpeed() < 60 || gamepad2.right_trigger <= 0.5 || !index.atTarget()) {
+                    launchState = LaunchState.SPIN_UP;
+                } else if (timer.time() - shootTime > 0.5) {
+                    launchState = LaunchState.POPPING;
+                    shootTime = timer.time();
+                }
+                break;
+
+            case POPPING:
                 shooter.pop();
-                index.setMode(IndexSubsystem.Mode.SHOOT_MANUAL); // switch to indexer slot
                 if (timer.time() - shootTime > 0.5) {
-                    shooter.unpop();
+                    shootTime = timer.time();
+                    launchState = LaunchState.UNPOPPING;
+                }
+                break;
+
+            case UNPOPPING:
+                shooter.unpop();
+                if (timer.time() - shootTime > 0.5) {
                     manualIndexerIndex = (manualIndexerIndex + 1) % 3;
                     index.setManualIndex(manualIndexerIndex);
                     launchState = LaunchState.SPIN_UP;

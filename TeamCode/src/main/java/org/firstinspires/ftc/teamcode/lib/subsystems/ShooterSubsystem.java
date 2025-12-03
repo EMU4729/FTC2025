@@ -72,14 +72,14 @@ public class ShooterSubsystem extends SubsystemBase {
      * Pops the ball into the shooter
      */
     public void pop() {
-        popServo.setPosition(0.25);
+        popServo.setPosition(0.55);
     }
 
     /**
      * Unpops the ball
      */
     public void unpop() {
-        popServo.setPosition(0.83);
+        popServo.setPosition(0);
     }
 
     @Override
