@@ -21,6 +21,7 @@ public class IndexTuningOpMode extends OpMode {
     private IndexSubsystem index;
     private int currentValue = 0;
     private final float[] values = {0, 0, 0, 359, 1, 1};
+    private double indexPosition = 0;
 
     @Override
     public void init() {
@@ -53,12 +54,11 @@ public class IndexTuningOpMode extends OpMode {
 
         // indexer rotation -> left stick x
         if (gamepad1.left_stick_x > 0.1) {
-            index.setMode(IndexSubsystem.Mode.CLOCKWISE);
+            indexPosition += 0.01;
         } else if (gamepad1.left_stick_x < -0.1) {
-            index.setMode(IndexSubsystem.Mode.ANTICLOCKWISE);
-        } else {
-            index.setMode(IndexSubsystem.Mode.IDLE);
+            indexPosition -= 0.01;
         }
+        index.unsafe_setPosition(indexPosition);
 
         // gain adjustment -> left and right bumper
         if (gamepad1.rightBumperWasPressed()) {

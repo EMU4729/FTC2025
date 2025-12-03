@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.lib.PIDController;
 
 import java.util.function.Function;
 
@@ -36,9 +35,8 @@ public class IndexSubsystem extends SubsystemBase {
     private static final float[] GREEN_MIN_HSV = new float[]{160, 0.5f, 0}; // TODO: tune
     private static final float[] GREEN_MAX_HSV = new float[]{180, 1, 1}; // TODO: tune
 
-    private static final double[] INTAKE_ROTATIONS = new double[]{Math.toRadians(115), Math.toRadians(235), Math.toRadians(2)}; // TODO: tune
+    private static final double[] INTAKE_ROTATIONS = new double[]{Math.toRadians(96), Math.toRadians(220), Math.toRadians(340)}; // TODO: tune
     private static final double[] SHOOT_ROTATIONS = new double[]{Math.toRadians(280), Math.toRadians(40), Math.toRadians(162)}; // TODO: tune
-    private final PIDController controller = new PIDController(0.08, 0, 0, 0);
 
     public enum Ball {
         GREEN,
@@ -78,13 +76,16 @@ public class IndexSubsystem extends SubsystemBase {
         setGain(COLOR_SENSOR_GAIN);
     }
 
+    public void unsafe_setPosition(double position) {
+        servo.setPosition(position);
+    }
+
     /**
      * Sets the slot index to rotate to in the intake and shooting manual modes
      *
      * @param index The slot index to go to
      */
     public void setManualIndex(int index) {
-        controller.resetIntegral();
         manualIndex = index;
     }
 
@@ -164,7 +165,6 @@ public class IndexSubsystem extends SubsystemBase {
      */
     public void setMode(Mode newMode) {
         mode = newMode;
-        controller.resetIntegral();
     }
 
     /**
@@ -256,9 +256,9 @@ public class IndexSubsystem extends SubsystemBase {
      */
     private void updateTelemetry() {
         telemetry.addData("Indexer Rotation (deg)", Math.toDegrees(rotation));
+        telemetry.addData("Indexer Setpoint", servo.getPosition());
         telemetry.addData("Indexer At Target", atTarget());
         telemetry.addData("Indexer Mode", mode);
-        telemetry.addData("Indexer Servo Power", servo.getPosition());
         telemetry.addData("Indexer Color Sensor Raw", colorSensor.getNormalizedColors().toColor());
         telemetry.addData("Indexer Color Sensor Conn Info", colorSensor.getConnectionInfo());
         telemetry.addData("Indexer Manual Index", manualIndex);
@@ -280,15 +280,13 @@ public class IndexSubsystem extends SubsystemBase {
         updateRotation();
         updateTelemetry();
 
+        // TODO: figure out what to do with these
         switch (mode) {
             case IDLE:
-                servo.setPosition(0.5);
                 return;
             case CLOCKWISE:
-                servo.setPosition(0.55);
                 return;
             case ANTICLOCKWISE:
-                servo.setPosition(0.45);
                 return;
         }
 
@@ -328,13 +326,12 @@ public class IndexSubsystem extends SubsystemBase {
         if (closestSlotIndex == -1) {
             // no available closest slot, idle
             atTarget = false;
-            servo.setPosition(0.5);
             return;
         }
 
         double error = -wrappedSignedAngleBetween(rotation, rotations[closestSlotIndex]);
         telemetry.addData("Indexer Error", error);
-        servo.setPosition(0.5 + controller.calculate(error));
-        atTarget = Math.abs(error) < 0.05;
+        servo.setPosition(rotations[closestSlotIndex] / (2 * Math.PI));
+        atTarget = Math.abs(error) < 0.1;
     }
 }

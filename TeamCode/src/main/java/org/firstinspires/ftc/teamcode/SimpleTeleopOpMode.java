@@ -102,14 +102,14 @@ public class SimpleTeleopOpMode extends OpMode {
             case SPIN_UP:
                 shooter.setSpeed(100);
                 index.setMode(IndexSubsystem.Mode.SHOOT_MANUAL); // switch to indexer slot
-                if (shooter.getMotorSpeed() >= 60 && gamepad2.right_trigger > 0.5 && index.atTarget()) {
+                if (shooter.getMotorSpeed() >= 67 && gamepad2.right_trigger > 0.5) {
                     launchState = LaunchState.HOLDING;
                     shootTime = timer.time();
                 }
                 break;
 
             case HOLDING:
-                if (shooter.getMotorSpeed() < 60 || gamepad2.right_trigger <= 0.5 || !index.atTarget()) {
+                if (shooter.getMotorSpeed() < 67 || gamepad2.right_trigger <= 0.5) {
                     launchState = LaunchState.SPIN_UP;
                 } else if (timer.time() - shootTime > 0.5) {
                     launchState = LaunchState.POPPING;
@@ -150,9 +150,9 @@ public class SimpleTeleopOpMode extends OpMode {
 
         // Shooter arc control
         if (gamepad2.dpad_up || gamepad1.dpad_up) {
-            shooterTilt += 0.05;
+            shooterTilt = Math.min(shooterTilt + 0.05, 1);
         } else if (gamepad2.dpad_down || gamepad1.dpad_down) {
-            shooterTilt -= 0.05;
+            shooterTilt = Math.max(shooterTilt - 0.05, 0);
         }
         shooter.setTilt(shooterTilt);
 
