@@ -40,6 +40,10 @@ public class LiftSubsystem extends SubsystemBase {
         setRightPower(power);
     }
 
+    public void setLockPosition(double position) {
+        leftLock.setPosition(position);
+        rightLock.setPosition(position);
+    }
 
     /**
      * Sets the power of the left lift motor.
