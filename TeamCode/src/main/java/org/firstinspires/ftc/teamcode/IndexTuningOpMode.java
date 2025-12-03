@@ -54,9 +54,9 @@ public class IndexTuningOpMode extends OpMode {
 
         // indexer rotation -> left stick x
         if (gamepad1.left_stick_x > 0.1) {
-            indexPosition += 0.01;
+            indexPosition = Math.min(indexPosition + 0.01, 1);
         } else if (gamepad1.left_stick_x < -0.1) {
-            indexPosition -= 0.01;
+            indexPosition = Math.max(indexPosition - 0.01, 0);
         }
         index.unsafe_setPosition(indexPosition);
 
