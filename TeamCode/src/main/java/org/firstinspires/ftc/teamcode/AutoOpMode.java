@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.lib.DriveGoTo;
 import org.firstinspires.ftc.teamcode.lib.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.IndexSubsystem;
-import org.firstinspires.ftc.teamcode.lib.subsystems.LocalisationSubsystem;
+import org.firstinspires.ftc.teamcode.lib.subsystems.OTOSLocalisationSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.ShooterSubsystem;
 
 @Autonomous(name = "Auto")
@@ -16,7 +16,7 @@ public class AutoOpMode extends OpMode {
     private DriveSubsystem drive;
     private IndexSubsystem index;
     private ShooterSubsystem shooter;
-    private LocalisationSubsystem localisation;
+    private OTOSLocalisationSubsystem localisation;
 
     private enum State {
         MOVING_BACK,
@@ -37,7 +37,7 @@ public class AutoOpMode extends OpMode {
         drive = new DriveSubsystem(hardwareMap, telemetry);
         index = new IndexSubsystem(hardwareMap, telemetry);
         shooter = new ShooterSubsystem(hardwareMap, telemetry);
-        localisation = new LocalisationSubsystem(hardwareMap, telemetry);
+        localisation = new OTOSLocalisationSubsystem(hardwareMap, telemetry);
         goToShootPositionCommand = new DriveGoTo(drive, localisation, new SparkFunOTOS.Pose2D());
         index.setStorage(IndexSubsystem.Ball.GREEN, IndexSubsystem.Ball.GREEN, IndexSubsystem.Ball.GREEN);
     }

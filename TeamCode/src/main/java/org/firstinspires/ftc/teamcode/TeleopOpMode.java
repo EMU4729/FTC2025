@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.lib.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.IndexSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.LiftSubsystem;
-import org.firstinspires.ftc.teamcode.lib.subsystems.LocalisationSubsystem;
+import org.firstinspires.ftc.teamcode.lib.subsystems.OTOSLocalisationSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.ShooterSubsystem;
 
 @TeleOp(name = "TeleOp")
@@ -21,7 +21,7 @@ public class TeleopOpMode extends OpMode {
     private IntakeSubsystem intake;
     private IndexSubsystem index;
     private ShooterSubsystem shooter;
-    private LocalisationSubsystem localisation;
+    private OTOSLocalisationSubsystem localisation;
     private LiftRaise liftRaiseCommand;
 
     private enum ShootState {
@@ -52,7 +52,7 @@ public class TeleopOpMode extends OpMode {
         index = new IndexSubsystem(hardwareMap, telemetry, DISABLE_COLOR_SENSOR);
         shooter = new ShooterSubsystem(hardwareMap, telemetry);
 //        led = new LEDSubsystem(hardwareMap, telemetry);
-        localisation = new LocalisationSubsystem(hardwareMap, telemetry);
+        localisation = new OTOSLocalisationSubsystem(hardwareMap, telemetry);
         liftRaiseCommand = new LiftRaise(localisation, lift);
     }
 

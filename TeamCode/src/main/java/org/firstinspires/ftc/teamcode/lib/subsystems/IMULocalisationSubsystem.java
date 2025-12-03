@@ -20,10 +20,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.Optional;
 
-public class LocalisationSubsystem {
-    private static final double OTOS_LINEAR_SCALAR = 1.0;
-    private static final double OTOS_ANGULAR_SCALAR = 1.0;
-    private static final SparkFunOTOS.Pose2D OTOS_OFFSET = new SparkFunOTOS.Pose2D(0, 0, 0);
+public class IMULocalisationSubsystem {
     private static final Position CAMERA_POSITION = new Position(
             DistanceUnit.METER, -0.13, -0.16, 0.045, 0);
     private static final YawPitchRollAngles CAMERA_ORIENTATION = new YawPitchRollAngles(AngleUnit.DEGREES,
@@ -34,15 +31,14 @@ public class LocalisationSubsystem {
             {IndexSubsystem.Ball.GREEN, IndexSubsystem.Ball.PURPLE, IndexSubsystem.Ball.PURPLE},
     };
     private final Telemetry telemetry;
-    private final SparkFunOTOS otosSensor;
     private final AprilTagProcessor aprilTag;
     private final VisionPortal visionPortal;
     private SparkFunOTOS.Pose2D robotPose = new SparkFunOTOS.Pose2D();
     private final IMU imu;
-    private boolean initialised = false;
     private int obeliskId = -1;
+    private boolean initialised = false;
 
-    public LocalisationSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
+    public IMULocalisationSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
         // setup vision
@@ -56,19 +52,6 @@ public class LocalisationSubsystem {
                 .setCameraResolution(new Size(1280, 800))
                 .addProcessor(aprilTag)
                 .build();
-
-        // setup otos
-        otosSensor = hardwareMap.get(SparkFunOTOS.class, "otos");
-        otosSensor.setLinearUnit(DistanceUnit.METER);
-        otosSensor.setAngularUnit(AngleUnit.RADIANS);
-        otosSensor.setOffset(OTOS_OFFSET);
-        otosSensor.setLinearScalar(OTOS_LINEAR_SCALAR);
-        otosSensor.setAngularScalar(OTOS_ANGULAR_SCALAR);
-        otosSensor.calibrateImu();
-        otosSensor.resetTracking();
-
-        // starting position, will be updated by april tag positioning.
-        otosSensor.setPosition(robotPose);
 
         imu = hardwareMap.get(IMU.class, "imu");
         imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(
@@ -109,19 +92,15 @@ public class LocalisationSubsystem {
     private void updateTelemetry() {
         telemetry.addData("AprilTag Positioning Complete", initialised);
         telemetry.addData("Robot Pose", robotPose.toString());
-        telemetry.addData("Robot Pose (OTOS)", otosSensor.getPosition().toString());
-        telemetry.addData("OTOS Connected?", otosSensor.isConnected());
     }
 
     public void periodic() {
         updateTelemetry();
-        robotPose = otosSensor.getPosition();
-
-        // early return if we don't need to do apriltag stuff anymore
-        if (initialised && obeliskId != -1) return;
 
         List<AprilTagDetection> freshDetections = aprilTag.getFreshDetections();
         if (freshDetections == null || freshDetections.isEmpty()) return;
+
+        SparkFunOTOS.Pose2D newPose = new SparkFunOTOS.Pose2D();
 
         for (AprilTagDetection detection : freshDetections) {
             // handle obelisk tags
@@ -131,15 +110,16 @@ public class LocalisationSubsystem {
             }
 
             // handle localisation initialisation
-            if (!initialised) {
-                robotPose = new SparkFunOTOS.Pose2D(
-                        detection.robotPose.getPosition().x,
-                        detection.robotPose.getPosition().y,
-                        detection.robotPose.getOrientation().getYaw(AngleUnit.RADIANS)
-                );
-                otosSensor.setPosition(robotPose);
-                initialised = true;
-            }
+            newPose.x += detection.robotPose.getPosition().x;
+            newPose.y += detection.robotPose.getPosition().y;
+            newPose.h += detection.robotPose.getOrientation().getYaw(AngleUnit.RADIANS);
+            initialised = true;
         }
+
+        newPose.x /= freshDetections.size();
+        newPose.y /= freshDetections.size();
+        newPose.h /= freshDetections.size();
+
+        robotPose = newPose;
     }
 }

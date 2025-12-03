@@ -4,15 +4,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.lib.subsystems.LiftSubsystem;
-import org.firstinspires.ftc.teamcode.lib.subsystems.LocalisationSubsystem;
+import org.firstinspires.ftc.teamcode.lib.subsystems.OTOSLocalisationSubsystem;
 
 public class LiftRaise {
     private static final double SYNC_P = 1;
-    private final LocalisationSubsystem localisation;
+    private final OTOSLocalisationSubsystem localisation;
     private final LiftSubsystem lift;
     private final ElapsedTime timer = new ElapsedTime();
 
-    public LiftRaise(LocalisationSubsystem localisation, LiftSubsystem lift) {
+    public LiftRaise(OTOSLocalisationSubsystem localisation, LiftSubsystem lift) {
         this.localisation = localisation;
         this.lift = lift;
     }

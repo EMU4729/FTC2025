@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.lib;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 
 import org.firstinspires.ftc.teamcode.lib.subsystems.DriveSubsystem;
-import org.firstinspires.ftc.teamcode.lib.subsystems.LocalisationSubsystem;
+import org.firstinspires.ftc.teamcode.lib.subsystems.OTOSLocalisationSubsystem;
 
 public class DriveGoTo {
     private static final double TRANSLATION_P = 0.3; // TODO: tune
@@ -14,10 +14,10 @@ public class DriveGoTo {
     private static final double ROTATION_THRESH = 0.1; // TODO: tune
 
     private final DriveSubsystem drive;
-    private final LocalisationSubsystem localisation;
+    private final OTOSLocalisationSubsystem localisation;
     private final SparkFunOTOS.Pose2D target;
 
-    public DriveGoTo(DriveSubsystem drive, LocalisationSubsystem localisation, SparkFunOTOS.Pose2D target) {
+    public DriveGoTo(DriveSubsystem drive, OTOSLocalisationSubsystem localisation, SparkFunOTOS.Pose2D target) {
         this.drive = drive;
         this.localisation = localisation;
         this.target = target;
