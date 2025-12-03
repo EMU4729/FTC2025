@@ -58,13 +58,14 @@ public class SimpleTeleopOpMode extends OpMode {
 
     @Override
     public void loop() {
+        // drive controls
         drive.driveRobotRelative(-gamepad2.left_stick_y, -gamepad2.left_stick_x, -gamepad2.right_stick_x);
 
         // intake controls
-        if (gamepad2.left_trigger > 0.5) {
+        if (gamepad1.left_trigger > 0.5 || gamepad2.left_trigger > 0.5) {
             index.setMode(IndexSubsystem.Mode.INTAKE_MANUAL);
             intake.setPower(1);
-        } else if (gamepad2.right_trigger <= 0.5) {
+        } else {
             intake.setPower(0);
         }
 
@@ -86,9 +87,9 @@ public class SimpleTeleopOpMode extends OpMode {
         index.setManualIndex(manualIndexerIndex);
 
         // auto shoot controls
-        if (gamepad2.right_trigger > 0.5 && launchState == LaunchState.IDLE) {
+        if ((gamepad1.right_trigger > 0.5 || gamepad2.right_trigger > 0.5) && launchState == LaunchState.IDLE) {
             launchState = LaunchState.SPIN_UP;
-        } else if (gamepad2.right_trigger <= 0.5) {
+        } else if (gamepad1.right_trigger <= 0.5 && gamepad2.right_trigger <= 0.5) {
             launchState = LaunchState.IDLE;
         }
 
@@ -101,7 +102,7 @@ public class SimpleTeleopOpMode extends OpMode {
             case SPIN_UP:
                 shooter.setSpeed(100);
                 index.setMode(IndexSubsystem.Mode.SHOOT_MANUAL);
-                if (shooter.getMotorSpeed() >= 67 && gamepad2.right_trigger > 0.5) {
+                if (shooter.getMotorSpeed() >= 67 && (gamepad1.right_trigger > 0.5 || gamepad2.right_trigger > 0.5)) {
                     launchState = LaunchState.POPPING;
                     shootTime = timer.time();
                 }
@@ -126,9 +127,9 @@ public class SimpleTeleopOpMode extends OpMode {
         }
 
         // shooter tilt control
-        if (gamepad2.dpad_up || gamepad1.dpad_up) {
+        if (gamepad1.dpad_up || gamepad2.dpad_up) {
             shooterTilt = Math.min(shooterTilt + 0.05, 1);
-        } else if (gamepad2.dpad_down || gamepad1.dpad_down) {
+        } else if (gamepad1.dpad_down || gamepad2.dpad_down) {
             shooterTilt = Math.max(shooterTilt - 0.05, 0);
         }
         shooter.setTilt(shooterTilt);
