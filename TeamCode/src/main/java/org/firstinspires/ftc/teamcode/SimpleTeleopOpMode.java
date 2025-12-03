@@ -30,7 +30,6 @@ public class SimpleTeleopOpMode extends OpMode {
     private enum LaunchState {
         IDLE,
         SPIN_UP,
-        HOLDING,
         POPPING,
         UNPOPPING,
     }
@@ -103,15 +102,6 @@ public class SimpleTeleopOpMode extends OpMode {
                 shooter.setSpeed(100);
                 index.setMode(IndexSubsystem.Mode.SHOOT_MANUAL); // switch to indexer slot
                 if (shooter.getMotorSpeed() >= 67 && gamepad2.right_trigger > 0.5) {
-                    launchState = LaunchState.HOLDING;
-                    shootTime = timer.time();
-                }
-                break;
-
-            case HOLDING:
-                if (shooter.getMotorSpeed() < 67 || gamepad2.right_trigger <= 0.5) {
-                    launchState = LaunchState.SPIN_UP;
-                } else if (timer.time() - shootTime > 0.5) {
                     launchState = LaunchState.POPPING;
                     shootTime = timer.time();
                 }
