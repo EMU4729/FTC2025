@@ -16,18 +16,6 @@ import org.firstinspires.ftc.teamcode.lib.subsystems.ShooterSubsystem;
 public class SimpleTeleopOpMode extends OpMode {
     private static final boolean DISABLE_COLOR_SENSOR = true;
 
-    private DriveSubsystem drive;
-    private LiftSubsystem lift;
-    private IntakeSubsystem intake;
-    private IndexSubsystem index;
-    private ShooterSubsystem shooter;
-    // private LEDSubsystem led;
-    private LocalisationSubsystem localisation;
-    private LiftRaise liftRaiseCommand;
-    private double shootTime = 0;
-    private double shooterTilt = 1;
-
-
     private enum LaunchState {
         IDLE,
         SPIN_UP,
@@ -35,11 +23,21 @@ public class SimpleTeleopOpMode extends OpMode {
         UNPOPPING,
     }
 
-    private LaunchState launchState;
+    private DriveSubsystem drive;
+    private LiftSubsystem lift;
+    private IntakeSubsystem intake;
+    private IndexSubsystem index;
+    private ShooterSubsystem shooter;
+    // private LEDSubsystem led;
+    private LocalisationSubsystem localisation;
 
+    private LiftRaise liftRaiseCommand;
 
-    private final ElapsedTime timer = new ElapsedTime();
+    private double shootTime = 0;
+    private double shooterTilt = 1;
     private int manualIndexerIndex = 0;
+    private LaunchState launchState;
+    private final ElapsedTime timer = new ElapsedTime();
 
     @Override
     public void init() {
@@ -62,15 +60,15 @@ public class SimpleTeleopOpMode extends OpMode {
     public void loop() {
         drive.driveRobotRelative(-gamepad2.left_stick_y, -gamepad2.left_stick_x, -gamepad2.right_stick_x);
 
-        // for human player intake
+        // intake controls
         if (gamepad2.left_trigger > 0.5) {
-            index.setMode(IndexSubsystem.Mode.INTAKE_MANUAL); // switch to indexer slot
+            index.setMode(IndexSubsystem.Mode.INTAKE_MANUAL);
             intake.setPower(1);
         } else if (gamepad2.right_trigger <= 0.5) {
             intake.setPower(0);
         }
 
-        // Rotate indexer
+        // indexer slot selection controls
         if (gamepad1.dpadLeftWasPressed() || gamepad2.dpadLeftWasPressed()) {
             if (manualIndexerIndex == 0) {
                 manualIndexerIndex = 2;
@@ -86,8 +84,8 @@ public class SimpleTeleopOpMode extends OpMode {
             }
         }
         index.setManualIndex(manualIndexerIndex);
-        telemetry.addData("Selected Indexer Slot", manualIndexerIndex);
 
+        // auto shoot controls
         if (gamepad2.right_trigger > 0.5 && launchState == LaunchState.IDLE) {
             launchState = LaunchState.SPIN_UP;
         } else if (gamepad2.right_trigger <= 0.5) {
@@ -102,7 +100,7 @@ public class SimpleTeleopOpMode extends OpMode {
 
             case SPIN_UP:
                 shooter.setSpeed(100);
-                index.setMode(IndexSubsystem.Mode.SHOOT_MANUAL); // switch to indexer slot
+                index.setMode(IndexSubsystem.Mode.SHOOT_MANUAL);
                 if (shooter.getMotorSpeed() >= 67 && gamepad2.right_trigger > 0.5) {
                     launchState = LaunchState.POPPING;
                     shootTime = timer.time();
@@ -127,6 +125,14 @@ public class SimpleTeleopOpMode extends OpMode {
                 break;
         }
 
+        // shooter tilt control
+        if (gamepad2.dpad_up || gamepad1.dpad_up) {
+            shooterTilt = Math.min(shooterTilt + 0.05, 1);
+        } else if (gamepad2.dpad_down || gamepad1.dpad_down) {
+            shooterTilt = Math.max(shooterTilt - 0.05, 0);
+        }
+        shooter.setTilt(shooterTilt);
+
         // lift control
         if (gamepad1.rightBumperWasPressed()) {
             liftRaiseCommand.start();
@@ -136,19 +142,12 @@ public class SimpleTeleopOpMode extends OpMode {
             liftRaiseCommand.end();
         }
 
-        // Shooter arc control
-        if (gamepad2.dpad_up || gamepad1.dpad_up) {
-            shooterTilt = Math.min(shooterTilt + 0.05, 1);
-        } else if (gamepad2.dpad_down || gamepad1.dpad_down) {
-            shooterTilt = Math.max(shooterTilt - 0.05, 0);
-        }
-        shooter.setTilt(shooterTilt);
-
         drive.periodic();
         lift.periodic();
         intake.periodic();
         index.periodic();
         shooter.periodic();
+        localisation.periodic();
         telemetry.update();
     }
 }
