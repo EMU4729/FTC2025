@@ -88,6 +88,7 @@ public class SimpleTeleopOpMode extends OpMode {
 
         if ((gamepad1.right_trigger > 0.5 || gamepad2.right_trigger > 0.5) && launchState == LaunchState.IDLE) {
             launchState = LaunchState.SPIN_UP;
+            shootTime = timer.time();
         } else if (gamepad1.right_trigger <= 0.5 && gamepad2.right_trigger <= 0.5) {
             launchState = LaunchState.IDLE;
         }
@@ -100,8 +101,8 @@ public class SimpleTeleopOpMode extends OpMode {
 
             case SPIN_UP:
                 shooter.setSpeed(100);
-                index.setMode(IndexSubsystem.Mode.SHOOT_MANUAL); // switch to indexer slot
-                if (shooter.getMotorSpeed() >= 67 && (gamepad1.right_trigger > 0.5 || gamepad2.right_trigger > 0.5)) {
+                index.setMode(IndexSubsystem.Mode.SHOOT_MANUAL);
+                if (shooter.getMotorSpeed() >= 67 && timer.time() - shootTime > 1 && (gamepad1.right_trigger > 0.5 || gamepad2.right_trigger > 0.5)) {
                     launchState = LaunchState.POPPING;
                     shootTime = timer.time();
                 }
