@@ -34,8 +34,8 @@ public class LiftRaise {
         double correction = roll * SYNC_P;
 
         // Apply power with correction We restrain the values to ensure they don't exceed +/- 1.0
-        double leftPower = 1 - correction;
-        double rightPower = 1 + correction;
+        double leftPower = -correction - 1;
+        double rightPower = correction - 1;
 
         leftPower = Math.max(-1, Math.min(1, leftPower));
         rightPower = Math.max(-1, Math.min(1, rightPower));
