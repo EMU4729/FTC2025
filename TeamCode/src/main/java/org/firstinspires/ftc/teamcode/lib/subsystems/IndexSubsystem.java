@@ -277,15 +277,17 @@ public class IndexSubsystem extends SubsystemBase {
         telemetry.addData("Indexer Setpoint", servo.getPosition());
         telemetry.addData("Indexer At Target", atTarget());
         telemetry.addData("Indexer Mode", mode);
-        telemetry.addData("Indexer Top Color Sensor HSV", getTopHSV());
-        telemetry.addData("Indexer Side Color Sensor HSV", getSideHSV());
         telemetry.addData("Indexer Color Sensor Conn Info", topColorSensor.getConnectionInfo());
         telemetry.addData("Indexer Manual Index", manualIndex);
         telemetry.addData("Indexer Storage", String.format("(%s, %s, %s)", storage[0], storage[1], storage[2]));
-        telemetry.addData("Indexer Detecting Green (Top)", hsvInRange(getTopHSV(), GREEN_MIN_HSV, GREEN_MAX_HSV));
-        telemetry.addData("Indexer Detecting Purple (Top)", hsvInRange(getTopHSV(), PURPLE_MIN_HSV, PURPLE_MAX_HSV));
-        telemetry.addData("Indexer Detecting Green (Side)", hsvInRange(getSideHSV(), GREEN_MIN_HSV, GREEN_MAX_HSV));
-        telemetry.addData("Indexer Detecting Purple (Side)", hsvInRange(getSideHSV(), PURPLE_MIN_HSV, PURPLE_MAX_HSV));
+        float[] topHsv = getTopHSV();
+        float[] sideHsv = getSideHSV();
+        telemetry.addData("Indexer Top Color Sensor HSV", String.format("(%f, %f, %f)", topHsv[0], topHsv[1], topHsv[2]));
+        telemetry.addData("Indexer Side Color Sensor HSV", String.format("(%f, %f, %f)", sideHsv[0], sideHsv[1], sideHsv[2]));
+        telemetry.addData("Indexer Detecting Green (Top)", hsvInRange(topHsv, GREEN_MIN_HSV, GREEN_MAX_HSV));
+        telemetry.addData("Indexer Detecting Purple (Top)", hsvInRange(topHsv, PURPLE_MIN_HSV, PURPLE_MAX_HSV));
+        telemetry.addData("Indexer Detecting Green (Side)", hsvInRange(sideHsv, GREEN_MIN_HSV, GREEN_MAX_HSV));
+        telemetry.addData("Indexer Detecting Purple (Side)", hsvInRange(sideHsv, PURPLE_MIN_HSV, PURPLE_MAX_HSV));
     }
 
     /**
