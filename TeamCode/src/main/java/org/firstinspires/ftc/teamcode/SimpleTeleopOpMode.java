@@ -14,13 +14,13 @@ import org.firstinspires.ftc.teamcode.lib.subsystems.ShooterSubsystem;
 
 @TeleOp(name = "Simple Teleop")
 public class SimpleTeleopOpMode extends OpMode {
-    DriveSubsystem drive;
-    LiftSubsystem lift;
-    IntakeSubsystem intake;
-    IndexSubsystem index;
-    ShooterSubsystem shooter;
-    //    LEDSubsystem led;
-    OTOSLocalisationSubsystem localisation;
+    private DriveSubsystem drive;
+    private LiftSubsystem lift;
+    private IntakeSubsystem intake;
+    private IndexSubsystem index;
+    private ShooterSubsystem shooter;
+    // private LEDSubsystem led;
+    private OTOSLocalisationSubsystem localisation;
     private double shootTime = 0;
     private double shooterTilt = 1;
     private LiftRaise liftRaiseCommand;
@@ -84,10 +84,13 @@ public class SimpleTeleopOpMode extends OpMode {
         }
         index.setManualIndex(manualIndexerIndex);
 
-        if ((gamepad1.right_trigger > 0.5 || gamepad2.right_trigger > 0.5) && launchState == LaunchState.IDLE) {
+        boolean revInput = gamepad1.right_trigger > 0.5 || gamepad2.right_trigger > 0.5;
+        boolean shootInput = gamepad1.a || gamepad2.a;
+
+        if (revInput && launchState == LaunchState.IDLE) {
             launchState = LaunchState.SPIN_UP;
             shootTime = timer.time();
-        } else if (gamepad1.right_trigger <= 0.5 && gamepad2.right_trigger <= 0.5) {
+        } else if (!revInput) {
             launchState = LaunchState.IDLE;
         }
 
@@ -100,7 +103,7 @@ public class SimpleTeleopOpMode extends OpMode {
             case SPIN_UP:
                 shooter.setSpeed(100);
                 index.setMode(IndexSubsystem.Mode.SHOOT_MANUAL);
-                if (shooter.getMotorSpeed() >= 67 && timer.time() - shootTime > 1 && (gamepad1.right_trigger > 0.5 || gamepad2.right_trigger > 0.5)) {
+                if (shooter.getMotorSpeed() >= 67 && timer.time() - shootTime > 1 && revInput && shootInput) {
                     launchState = LaunchState.POPPING;
                     shootTime = timer.time();
                 }
