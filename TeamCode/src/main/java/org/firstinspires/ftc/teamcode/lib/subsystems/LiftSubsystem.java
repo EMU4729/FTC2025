@@ -26,7 +26,7 @@ public class LiftSubsystem extends SubsystemBase {
         rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rightLock.setDirection(Servo.Direction.REVERSE);
 
-        setLockPosition(1);
+        lock();
 
         this.telemetry = telemetry;
     }
@@ -49,6 +49,27 @@ public class LiftSubsystem extends SubsystemBase {
     public void setLockPosition(double position) {
         leftLock.setPosition(position);
         rightLock.setPosition(position);
+    }
+
+    /**
+     * Sets the positions of the locking servos.
+     *
+     * @param left  The position to set the left servo to.
+     * @param right The position to set the right servo to.
+     */
+    public void setLockPosition(double left, double right) {
+        leftLock.setPosition(left);
+        rightLock.setPosition(right);
+    }
+
+    public void lock() {
+        leftLock.setPosition(0.5);
+        rightLock.setPosition(0.25);
+    }
+
+    public void unlock() {
+        leftLock.setPosition(0.4);
+        rightLock.setPosition(0.15);
     }
 
     /**

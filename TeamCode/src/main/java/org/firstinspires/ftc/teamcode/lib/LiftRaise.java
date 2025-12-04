@@ -24,7 +24,7 @@ public class LiftRaise {
     public void execute() {
         // unlock lift for the first 0.5s
         if (timer.time() < 0.5) {
-            lift.setLockPosition(0);
+            lift.unlock();
             return;
         }
 

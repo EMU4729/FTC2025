@@ -8,7 +8,8 @@ import org.firstinspires.ftc.teamcode.lib.subsystems.LiftSubsystem;
 @TeleOp(name = "Lift Test")
 public class LiftTestOpMode extends OpMode {
     private LiftSubsystem lift;
-    private double lockPosition = 1;
+    private double leftLockPosition = 1;
+    private double rightLockPosition = 1;
 
     public void init() {
         lift = new LiftSubsystem(hardwareMap, telemetry);
@@ -16,11 +17,16 @@ public class LiftTestOpMode extends OpMode {
 
     public void loop() {
         if (gamepad1.dpad_left) {
-            lockPosition = Math.max(lockPosition - 0.01, 0);
+            leftLockPosition = Math.max(leftLockPosition - 0.001, 0);
         } else if (gamepad1.dpad_right) {
-            lockPosition = Math.min(lockPosition + 0.01, 1);
+            leftLockPosition = Math.min(leftLockPosition + 0.001, 1);
         }
-        lift.setLockPosition(lockPosition);
+        if (gamepad1.dpad_up) {
+            rightLockPosition = Math.max(rightLockPosition - 0.001, 0);
+        } else if (gamepad1.dpad_down) {
+            rightLockPosition = Math.min(rightLockPosition + 0.001, 1);
+        }
+        lift.setLockPosition(leftLockPosition, rightLockPosition);
 
         if (gamepad1.left_bumper) {
             lift.setLeftPower(1);
@@ -33,5 +39,11 @@ public class LiftTestOpMode extends OpMode {
         } else {
             lift.setRightPower(0);
         }
+
+        telemetry.addData("Lift Left Lock Position", leftLockPosition);
+        telemetry.addData("Lift Right Lock Position", rightLockPosition);
+
+        lift.periodic();
+        telemetry.update();
     }
 }
