@@ -30,10 +30,14 @@ public class IndexSubsystem extends SubsystemBase {
     }
 
     private static final float COLOR_SENSOR_GAIN = 1; // TODO: tune
-    private static final float[] PURPLE_MIN_HSV = new float[]{220, 0.3f, 0}; // TODO: tune
-    private static final float[] PURPLE_MAX_HSV = new float[]{240, 1, 0.1f}; // TODO: tune
-    private static final float[] GREEN_MIN_HSV = new float[]{160, 0.5f, 0}; // TODO: tune
-    private static final float[] GREEN_MAX_HSV = new float[]{180, 1, 1}; // TODO: tune
+    private static final float[] SIDE_PURPLE_MIN_HSV = new float[]{220, 0.3f, 0}; // TODO: tune
+    private static final float[] SIDE_PURPLE_MAX_HSV = new float[]{240, 1, 0.1f}; // TODO: tune
+    private static final float[] SIDE_GREEN_MIN_HSV = new float[]{160, 0.5f, 0}; // TODO: tune
+    private static final float[] SIDE_GREEN_MAX_HSV = new float[]{180, 1, 1}; // TODO: tune
+    private static final float[] TOP_PURPLE_MIN_HSV = new float[]{180, 0.3f, 0}; // TODO: tune
+    private static final float[] TOP_PURPLE_MAX_HSV = new float[]{240, 1, 0.1f}; // TODO: tune
+    private static final float[] TOP_GREEN_MIN_HSV = new float[]{120, 0.5f, 0}; // TODO: tune
+    private static final float[] TOP_GREEN_MAX_HSV = new float[]{180, 1, 1}; // TODO: tune
 
     private static final double[] INTAKE_ROTATIONS = new double[]{Math.toRadians(96), Math.toRadians(220), Math.toRadians(340)}; // TODO: tune
     private static final double[] SHOOT_ROTATIONS = new double[]{Math.toRadians(280), Math.toRadians(40), Math.toRadians(162)}; // TODO: tune
@@ -260,10 +264,10 @@ public class IndexSubsystem extends SubsystemBase {
         if (disableColorSensor) return;
         float[] topHsv = getTopHSV();
         float[] sideHsv = getSideHSV();
-        if (hsvInRange(topHsv, GREEN_MIN_HSV, GREEN_MAX_HSV) || hsvInRange(sideHsv, GREEN_MIN_HSV, GREEN_MAX_HSV)) {
+        if (hsvInRange(topHsv, TOP_GREEN_MIN_HSV, TOP_GREEN_MAX_HSV) || hsvInRange(sideHsv, SIDE_GREEN_MIN_HSV, SIDE_GREEN_MAX_HSV)) {
             storage[slotIndex] = Ball.GREEN;
             ballRecentlyIntaken = true;
-        } else if (hsvInRange(topHsv, PURPLE_MIN_HSV, PURPLE_MAX_HSV) || hsvInRange(sideHsv, PURPLE_MIN_HSV, PURPLE_MAX_HSV)) {
+        } else if (hsvInRange(topHsv, TOP_PURPLE_MIN_HSV, TOP_PURPLE_MAX_HSV) || hsvInRange(sideHsv, SIDE_PURPLE_MIN_HSV, SIDE_PURPLE_MAX_HSV)) {
             storage[slotIndex] = Ball.PURPLE;
             ballRecentlyIntaken = true;
         }
@@ -284,10 +288,10 @@ public class IndexSubsystem extends SubsystemBase {
         float[] sideHsv = getSideHSV();
         telemetry.addData("Indexer Top Color Sensor HSV", String.format("(%f, %f, %f)", topHsv[0], topHsv[1], topHsv[2]));
         telemetry.addData("Indexer Side Color Sensor HSV", String.format("(%f, %f, %f)", sideHsv[0], sideHsv[1], sideHsv[2]));
-        telemetry.addData("Indexer Detecting Green (Top)", hsvInRange(topHsv, GREEN_MIN_HSV, GREEN_MAX_HSV));
-        telemetry.addData("Indexer Detecting Purple (Top)", hsvInRange(topHsv, PURPLE_MIN_HSV, PURPLE_MAX_HSV));
-        telemetry.addData("Indexer Detecting Green (Side)", hsvInRange(sideHsv, GREEN_MIN_HSV, GREEN_MAX_HSV));
-        telemetry.addData("Indexer Detecting Purple (Side)", hsvInRange(sideHsv, PURPLE_MIN_HSV, PURPLE_MAX_HSV));
+        telemetry.addData("Indexer Detecting Green (Top)", hsvInRange(topHsv, SIDE_GREEN_MIN_HSV, SIDE_GREEN_MAX_HSV));
+        telemetry.addData("Indexer Detecting Purple (Top)", hsvInRange(topHsv, SIDE_PURPLE_MIN_HSV, SIDE_PURPLE_MAX_HSV));
+        telemetry.addData("Indexer Detecting Green (Side)", hsvInRange(sideHsv, SIDE_GREEN_MIN_HSV, SIDE_GREEN_MAX_HSV));
+        telemetry.addData("Indexer Detecting Purple (Side)", hsvInRange(sideHsv, SIDE_PURPLE_MIN_HSV, SIDE_PURPLE_MAX_HSV));
     }
 
     /**
