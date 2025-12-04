@@ -39,7 +39,7 @@ public class IndexSubsystem extends SubsystemBase {
     private static final float[] TOP_GREEN_MIN_HSV = new float[]{120, 0.5f, 0}; // TODO: tune
     private static final float[] TOP_GREEN_MAX_HSV = new float[]{180, 1, 1}; // TODO: tune
 
-    private static final double[] INTAKE_ROTATIONS = new double[]{Math.toRadians(96), Math.toRadians(220), Math.toRadians(340)}; // TODO: tune
+    private static final double[] INTAKE_ROTATIONS = new double[]{Math.toRadians(116), Math.toRadians(240), Math.toRadians(0)}; // TODO: tune
     private static final double[] SHOOT_ROTATIONS = new double[]{Math.toRadians(280), Math.toRadians(40), Math.toRadians(162)}; // TODO: tune
 
     public enum Ball {
