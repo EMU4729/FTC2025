@@ -54,7 +54,6 @@ public class IndexSubsystem extends SubsystemBase {
     private final NormalizedColorSensor sideColorSensor;
     private final NormalizedColorSensor topColorSensor;
     private final Ball[] storage = new Ball[]{Ball.EMPTY, Ball.EMPTY, Ball.EMPTY};
-    private final boolean disableColorSensor;
     private Mode mode = Mode.IDLE;
     private double rotation = 0;
     private boolean atTarget = false;
@@ -62,12 +61,7 @@ public class IndexSubsystem extends SubsystemBase {
     private int manualIndex = 0;
 
     public IndexSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
-        this(hardwareMap, telemetry, false);
-    }
-
-    public IndexSubsystem(HardwareMap hardwareMap, Telemetry telemetry, boolean disableColorSensor) {
         this.telemetry = telemetry;
-        this.disableColorSensor = disableColorSensor;
         servo = hardwareMap.get(Servo.class, "indexServo");
         servo.setDirection(Servo.Direction.REVERSE);
         encoder = hardwareMap.get(AnalogInput.class, "indexEncoder");
@@ -261,7 +255,7 @@ public class IndexSubsystem extends SubsystemBase {
      * @param slotIndex The index to store the detected ball in
      */
     private void detectEnteringBalls(int slotIndex) {
-        if (disableColorSensor || slotIndex == -1) return;
+        if (slotIndex == -1) return;
         float[] topHsv = getTopHSV();
         float[] sideHsv = getSideHSV();
         if (hsvInRange(topHsv, TOP_GREEN_MIN_HSV, TOP_GREEN_MAX_HSV) || hsvInRange(sideHsv, SIDE_GREEN_MIN_HSV, SIDE_GREEN_MAX_HSV)) {

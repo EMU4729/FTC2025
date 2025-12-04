@@ -14,8 +14,6 @@ import org.firstinspires.ftc.teamcode.lib.subsystems.ShooterSubsystem;
 
 @TeleOp(name = "Simple Teleop")
 public class SimpleTeleopOpMode extends OpMode {
-    private static final boolean DISABLE_COLOR_SENSOR = true;
-
     DriveSubsystem drive;
     LiftSubsystem lift;
     IntakeSubsystem intake;
@@ -45,7 +43,7 @@ public class SimpleTeleopOpMode extends OpMode {
         drive = new DriveSubsystem(hardwareMap, telemetry);
         lift = new LiftSubsystem(hardwareMap, telemetry);
         intake = new IntakeSubsystem(hardwareMap, telemetry);
-        index = new IndexSubsystem(hardwareMap, telemetry, DISABLE_COLOR_SENSOR);
+        index = new IndexSubsystem(hardwareMap, telemetry);
         shooter = new ShooterSubsystem(hardwareMap, telemetry);
         localisation = new OTOSLocalisationSubsystem(hardwareMap, telemetry);
         launchState = LaunchState.IDLE;
