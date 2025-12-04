@@ -50,6 +50,7 @@ public class LiftSubsystem extends SubsystemBase {
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightLock.setDirection(Servo.Direction.REVERSE);
 
         setLockPosition(1);
 
