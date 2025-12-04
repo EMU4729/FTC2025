@@ -261,7 +261,7 @@ public class IndexSubsystem extends SubsystemBase {
      * @param slotIndex The index to store the detected ball in
      */
     private void detectEnteringBalls(int slotIndex) {
-        if (disableColorSensor) return;
+        if (disableColorSensor || slotIndex == -1) return;
         float[] topHsv = getTopHSV();
         float[] sideHsv = getSideHSV();
         if (hsvInRange(topHsv, TOP_GREEN_MIN_HSV, TOP_GREEN_MAX_HSV) || hsvInRange(sideHsv, SIDE_GREEN_MIN_HSV, SIDE_GREEN_MAX_HSV)) {
