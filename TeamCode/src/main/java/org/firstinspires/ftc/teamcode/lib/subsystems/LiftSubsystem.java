@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.lib.subsystems;
 
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -12,9 +11,6 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.lib.PIDController;
 
@@ -57,7 +53,6 @@ public class LiftSubsystem extends SubsystemBase {
         this.telemetry = telemetry;
         lastTimeNano = System.nanoTime();
     }
-
 
 
     public void updateBalance() {
@@ -111,6 +106,7 @@ public class LiftSubsystem extends SubsystemBase {
         telemetry.addData("Lift/Error", error);
         telemetry.addData("Lift/Power", motorPower);
     }
+
     private double applyMotorDeadband(double input) {
         // If input is tiny (noise), do nothing
         if (Math.abs(input) < 0.02) return 0.0;
@@ -157,12 +153,6 @@ public class LiftSubsystem extends SubsystemBase {
     public void setRightPower(double power) {
         rightMotor.setPower(power);
     }
-
-    public void loop(){
-        getIMUReading();
-
-    }
-
 }
 
 
