@@ -31,19 +31,16 @@ public class RedThreeBallAutoOpMode extends LinearOpMode {
 
         waitForStart();
         index.setMode(IndexSubsystem.Mode.SHOOT_ANY);
-        timer.reset();
 
         // wait for motif detection
+        timer.reset();
         do {
             drive.stop();
             periodic();
-        } while (!localisation.getMotif().isPresent() && opModeIsActive());
-
-        // avoid an exception if motif not present
-        if (!opModeIsActive()) return;
+        } while (!localisation.getMotif().isPresent() && timer.time() <= 1 && opModeIsActive());
 
         // prime the indexer and shooter
-        IndexSubsystem.Ball[] motif = localisation.getMotif().get();
+        IndexSubsystem.Ball[] motif = localisation.getMotif().orElse(new IndexSubsystem.Ball[]{IndexSubsystem.Ball.GREEN, IndexSubsystem.Ball.PURPLE, IndexSubsystem.Ball.PURPLE});
         int motifIndex = 0;
         IndexSubsystem.Mode shootMode;
         switch (motif[motifIndex]) {
