@@ -213,7 +213,7 @@ public class IndexSubsystem extends SubsystemBase {
      * @param b The second angle, in the range [0, 360]
      * @return The wrapped signed angle between a and b
      */
-    private double wrappedSignedAngleBetween(double a, double b) {
+    public static double wrappedSignedAngleBetween(double a, double b) {
         double result = a - b;
         if (result < -Math.PI) result += 2 * Math.PI;
         else if (result > Math.PI) result -= 2 * Math.PI;

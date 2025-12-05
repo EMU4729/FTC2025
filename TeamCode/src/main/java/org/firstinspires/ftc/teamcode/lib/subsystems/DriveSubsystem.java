@@ -14,6 +14,10 @@ public class DriveSubsystem extends SubsystemBase {
     private final Telemetry telemetry;
 
     public DriveSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
+        this(hardwareMap, telemetry, DcMotor.ZeroPowerBehavior.FLOAT);
+    }
+
+    public DriveSubsystem(HardwareMap hardwareMap, Telemetry telemetry, DcMotor.ZeroPowerBehavior zeroPowerBehavior) {
         frontLeft = hardwareMap.get(DcMotor.class, "driveFL");
         frontRight = hardwareMap.get(DcMotor.class, "driveFR");
         rearLeft = hardwareMap.get(DcMotor.class, "driveRL");
@@ -23,6 +27,11 @@ public class DriveSubsystem extends SubsystemBase {
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
         rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         rearRight.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        frontLeft.setZeroPowerBehavior(zeroPowerBehavior);
+        frontRight.setZeroPowerBehavior(zeroPowerBehavior);
+        rearLeft.setZeroPowerBehavior(zeroPowerBehavior);
+        rearRight.setZeroPowerBehavior(zeroPowerBehavior);
 
         this.telemetry = telemetry;
     }
