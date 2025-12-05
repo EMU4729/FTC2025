@@ -140,7 +140,7 @@ public class TeleopOpMode extends OpMode {
             case PREPARING:
                 index.setMode(shootMode);
                 shooter.setSpeed(gamepad2.y ? 0.5 : 2);
-                if (index.atTarget() && shooter.atDesiredSpeed() && gamepad2.right_trigger > 0.5) {
+                if (index.atTarget() && shooter.getMotorSpeed() > 67 && gamepad2.right_trigger > 0.5) {
                     shootState = ShootState.SHOOTING;
                     shootTime = timer.time();
                 }

@@ -101,9 +101,9 @@ public class SimpleTeleopOpMode extends OpMode {
                 break;
 
             case SPIN_UP:
-                shooter.setSpeed(100);
+                shooter.setSpeed(67);
                 index.setMode(IndexSubsystem.Mode.SHOOT_MANUAL);
-                if (shooter.getMotorSpeed() >= 67 && timer.time() - shootTime > 1 && revInput && shootInput) {
+                if (Math.abs(shooter.getMotorSpeed() - 65) < 0.5 && timer.time() - shootTime > 1 && revInput && shootInput) {
                     launchState = LaunchState.POPPING;
                     shootTime = timer.time();
                 }

@@ -67,7 +67,7 @@ public class AutoOpMode extends OpMode {
                 if (goToShootPositionCommand.atTarget()) state = State.WAITING_TO_SHOOT;
                 break;
             case WAITING_TO_SHOOT:
-                if (index.atTarget() && shooter.atDesiredSpeed()) {
+                if (index.atTarget() && shooter.getMotorSpeed() > 67) {
                     shootTime = timer.time();
                     state = State.SHOOTING;
                 }

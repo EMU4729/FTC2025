@@ -9,7 +9,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class ShooterSubsystem extends SubsystemBase {
     private static final double TICKS_PER_SHOOTER_ROTATION = 28;
-    private static final double SHOOTER_PID_P = 1000;
+    private static final double SHOOTER_PID_P = 400;
     private static final double SHOOTER_PID_I = 0;
     private static final double SHOOTER_PID_D = 0;
 
@@ -24,7 +24,7 @@ public class ShooterSubsystem extends SubsystemBase {
         tiltServo = hardwareMap.get(Servo.class, "shooterTilt");
         popServo = hardwareMap.get(Servo.class, "shooterPop");
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motor.setVelocityPIDFCoefficients(SHOOTER_PID_P, SHOOTER_PID_I, SHOOTER_PID_D, 0);
+        motor.setVelocityPIDFCoefficients(SHOOTER_PID_P, SHOOTER_PID_I, SHOOTER_PID_D, 0.4);
         this.telemetry = telemetry;
     }
 
@@ -43,13 +43,6 @@ public class ShooterSubsystem extends SubsystemBase {
      */
     public double getMotorSpeed() {
         return motor.getVelocity() / TICKS_PER_SHOOTER_ROTATION;
-    }
-
-    /**
-     * @return true if the motor is at the desired speed, false if not
-     */
-    public boolean atDesiredSpeed() {
-        return Math.abs(vel - getMotorSpeed()) < 0.1;
     }
 
     /**
@@ -87,6 +80,5 @@ public class ShooterSubsystem extends SubsystemBase {
         telemetry.addData("Shooter Speed (rps)", getMotorSpeed());
         telemetry.addData("Shooter Desired Speed (rps)", vel);
         telemetry.addData("Shooter Tilt", tiltServo.getPosition());
-        telemetry.addData("Shooter At Target Speed", atDesiredSpeed());
     }
 }
