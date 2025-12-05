@@ -9,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class LEDSubsystem extends SubsystemBase {
     private static final int STRING_LENGTH = 50; // todo: change
+    private static final boolean DISABLE = true;
 
     public enum Mode {
         RAINBOW,
@@ -23,6 +24,7 @@ public class LEDSubsystem extends SubsystemBase {
 
     public LEDSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         leds = hardwareMap.get(AdafruitNeoDriver.class, "leds");
+        if (DISABLE) return;
         leds.setNumberOfPixels(STRING_LENGTH);
     }
 
@@ -47,6 +49,7 @@ public class LEDSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        if (DISABLE) return;
         switch (mode) {
             case SOLID:
                 leds.fill(solidColor);
