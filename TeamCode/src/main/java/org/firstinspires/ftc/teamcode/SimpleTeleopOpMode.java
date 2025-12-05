@@ -63,6 +63,8 @@ public class SimpleTeleopOpMode extends OpMode {
         if (gamepad1.left_trigger > 0.5 || gamepad2.left_trigger > 0.5) {
             index.setMode(IndexSubsystem.Mode.INTAKE_MANUAL); // switch to indexer slot
             intake.setPower(1);
+        } else if (gamepad1.left_bumper || gamepad2.left_bumper) {
+            intake.setPower(-1);
         } else {
             intake.setPower(0);
         }
