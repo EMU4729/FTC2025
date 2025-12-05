@@ -293,7 +293,20 @@ public class IndexSubsystem extends SubsystemBase {
      * Empty the current slot (from the perspective of the shooter).
      */
     public void emptyCurrentSlot() {
-        int closestSlotIndex = closestSlot(SHOOT_ROTATIONS, (i) -> storage[i] != Ball.EMPTY);
+        Function<Integer, Boolean> predicate;
+        switch (mode) {
+            case SHOOT_GREEN_ONLY:
+                predicate = (i) -> storage[i] == Ball.GREEN;
+                break;
+            case SHOOT_PURPLE_ONLY:
+                predicate = (i) -> storage[i] == Ball.PURPLE;
+                break;
+            default:
+                predicate = (i) -> storage[i] != Ball.EMPTY;
+                break;
+        }
+        int closestSlotIndex = closestSlot(SHOOT_ROTATIONS, predicate);
+        if (closestSlotIndex == -1) return;
         storage[closestSlotIndex] = Ball.EMPTY;
     }
 

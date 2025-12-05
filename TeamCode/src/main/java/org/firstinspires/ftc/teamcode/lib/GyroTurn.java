@@ -37,7 +37,7 @@ public class GyroTurn {
         double error = IndexSubsystem.wrappedSignedAngleBetween(getYaw(), targetYaw);
         telemetry.addData("Gyro Turn Error", error);
         telemetry.update();
-        drive.driveRobotRelative(0, 0, -2 * error);
+        drive.driveRobotRelative(0, 0, -1.5 * error);
     }
 
     public boolean isFinished() {

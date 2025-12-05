@@ -30,8 +30,8 @@ public class OTOSLocalisationSubsystem {
             180, -45, 0, 0);
     private static final IndexSubsystem.Ball[][] OBELISK_PATTERNS = {
             {IndexSubsystem.Ball.GREEN, IndexSubsystem.Ball.PURPLE, IndexSubsystem.Ball.PURPLE},
-            {IndexSubsystem.Ball.GREEN, IndexSubsystem.Ball.PURPLE, IndexSubsystem.Ball.PURPLE},
-            {IndexSubsystem.Ball.GREEN, IndexSubsystem.Ball.PURPLE, IndexSubsystem.Ball.PURPLE},
+            {IndexSubsystem.Ball.PURPLE, IndexSubsystem.Ball.GREEN, IndexSubsystem.Ball.PURPLE},
+            {IndexSubsystem.Ball.PURPLE, IndexSubsystem.Ball.PURPLE, IndexSubsystem.Ball.GREEN},
     };
     private final Telemetry telemetry;
     private final SparkFunOTOS otosSensor;

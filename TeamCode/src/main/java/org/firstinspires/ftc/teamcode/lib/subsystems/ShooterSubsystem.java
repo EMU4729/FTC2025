@@ -26,6 +26,7 @@ public class ShooterSubsystem extends SubsystemBase {
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motor.setVelocityPIDFCoefficients(SHOOTER_PID_P, SHOOTER_PID_I, SHOOTER_PID_D, 0.4);
         this.telemetry = telemetry;
+        unpop();
     }
 
     /**
