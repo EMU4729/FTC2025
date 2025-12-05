@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.lib.GyroStraight;
 import org.firstinspires.ftc.teamcode.lib.GyroTurn;
 import org.firstinspires.ftc.teamcode.lib.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.IndexSubsystem;
@@ -29,6 +30,8 @@ public class BlueThreeBallAutoOpMode extends LinearOpMode {
         index = new IndexSubsystem(hardwareMap, telemetry);
         shooter = new ShooterSubsystem(hardwareMap, telemetry);
         led = new LEDSubsystem(hardwareMap, telemetry);
+
+        GyroStraight gyroStraightCommand = new GyroStraight(0, 1, drive, localisation, telemetry);
         GyroTurn gyroTurnCommand = new GyroTurn(Math.PI / 2, drive, localisation, telemetry);
         ElapsedTime timer = new ElapsedTime();
 
@@ -36,6 +39,15 @@ public class BlueThreeBallAutoOpMode extends LinearOpMode {
 
         waitForStart();
         index.setMode(IndexSubsystem.Mode.SHOOT_ANY);
+
+        // go right to see obelisk
+        timer.reset();
+        gyroStraightCommand.start();
+        do {
+            gyroStraightCommand.execute();
+            periodic();
+        } while (timer.time() <= 1.3 && opModeIsActive());
+        gyroStraightCommand.end();
 
         // wait for motif detection
         timer.reset();
@@ -118,7 +130,7 @@ public class BlueThreeBallAutoOpMode extends LinearOpMode {
         // leave
         timer.reset();
         do {
-            drive.driveRobotRelative(0, -1, 0);
+            drive.driveRobotRelative(0, 1, 0);
             periodic();
         } while (timer.time() < 1 && opModeIsActive());
 
