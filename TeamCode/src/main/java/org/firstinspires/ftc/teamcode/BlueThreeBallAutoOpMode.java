@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -8,6 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.lib.GyroTurn;
 import org.firstinspires.ftc.teamcode.lib.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.IndexSubsystem;
+import org.firstinspires.ftc.teamcode.lib.subsystems.LEDSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.OTOSLocalisationSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.ShooterSubsystem;
 
@@ -17,6 +20,7 @@ public class BlueThreeBallAutoOpMode extends LinearOpMode {
     private OTOSLocalisationSubsystem localisation;
     private IndexSubsystem index;
     private ShooterSubsystem shooter;
+    private LEDSubsystem led;
 
     @Override
     public void runOpMode() {
@@ -24,6 +28,7 @@ public class BlueThreeBallAutoOpMode extends LinearOpMode {
         localisation = new OTOSLocalisationSubsystem(hardwareMap, telemetry);
         index = new IndexSubsystem(hardwareMap, telemetry);
         shooter = new ShooterSubsystem(hardwareMap, telemetry);
+        led = new LEDSubsystem(hardwareMap, telemetry);
         GyroTurn gyroTurnCommand = new GyroTurn(Math.PI / 2, drive, localisation, telemetry);
         ElapsedTime timer = new ElapsedTime();
 
@@ -40,6 +45,11 @@ public class BlueThreeBallAutoOpMode extends LinearOpMode {
         } while (!localisation.getMotif().isPresent() && timer.time() <= 0.5 && opModeIsActive());
 
         // prime the indexer and shooter
+        if (!localisation.getMotif().isPresent()) {
+            led.setSolidColor(Color.RED);
+            led.setMode(LEDSubsystem.Mode.SOLID);
+        }
+
         IndexSubsystem.Ball[] motif = localisation.getMotif().orElse(new IndexSubsystem.Ball[]{IndexSubsystem.Ball.GREEN, IndexSubsystem.Ball.PURPLE, IndexSubsystem.Ball.PURPLE});
         int motifIndex = 0;
         IndexSubsystem.Mode shootMode;
@@ -123,6 +133,7 @@ public class BlueThreeBallAutoOpMode extends LinearOpMode {
         index.periodic();
         localisation.periodic();
         shooter.periodic();
+        led.periodic();
         telemetry.update();
     }
 }

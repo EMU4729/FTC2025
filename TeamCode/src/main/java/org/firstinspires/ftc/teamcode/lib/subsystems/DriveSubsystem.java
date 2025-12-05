@@ -14,7 +14,7 @@ public class DriveSubsystem extends SubsystemBase {
     private final Telemetry telemetry;
 
     public DriveSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
-        this(hardwareMap, telemetry, DcMotor.ZeroPowerBehavior.FLOAT);
+        this(hardwareMap, telemetry, DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     public DriveSubsystem(HardwareMap hardwareMap, Telemetry telemetry, DcMotor.ZeroPowerBehavior zeroPowerBehavior) {

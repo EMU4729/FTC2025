@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -8,6 +10,7 @@ import org.firstinspires.ftc.teamcode.lib.LiftRaise;
 import org.firstinspires.ftc.teamcode.lib.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.IndexSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.lib.subsystems.LEDSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.OTOSLocalisationSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.ShooterSubsystem;
@@ -19,7 +22,7 @@ public class TeleopOpMode extends OpMode {
     private IntakeSubsystem intake;
     private IndexSubsystem index;
     private ShooterSubsystem shooter;
-    // private LEDSubsystem led;
+    private LEDSubsystem led;
     private OTOSLocalisationSubsystem localisation;
     private double shootTime = 0;
     private double shooterTilt = 1;
@@ -45,6 +48,7 @@ public class TeleopOpMode extends OpMode {
         index = new IndexSubsystem(hardwareMap, telemetry);
         shooter = new ShooterSubsystem(hardwareMap, telemetry);
         localisation = new OTOSLocalisationSubsystem(hardwareMap, telemetry);
+        led = new LEDSubsystem(hardwareMap, telemetry);
         launchState = LaunchState.IDLE;
         liftRaiseCommand = new LiftRaise(localisation, lift);
     }
@@ -68,11 +72,15 @@ public class TeleopOpMode extends OpMode {
 
         if (gamepad1.a || gamepad2.a) {
             shootMode = IndexSubsystem.Mode.SHOOT_GREEN_ONLY;
+            led.setSolidColor(Color.GREEN);
         } else if (gamepad1.x || gamepad2.x) {
             shootMode = IndexSubsystem.Mode.SHOOT_PURPLE_ONLY;
+            led.setSolidColor(Color.BLUE);
         } else if (gamepad1.b || gamepad2.b) {
             shootMode = IndexSubsystem.Mode.SHOOT_ANY;
+            led.setSolidColor(Color.RED);
         }
+        led.setMode(LEDSubsystem.Mode.SOLID);
         telemetry.addData("Shooting Mode", shootMode);
 
         boolean revInput = gamepad1.right_trigger > 0.5 || gamepad2.right_trigger > 0.5;
