@@ -12,35 +12,30 @@ import org.firstinspires.ftc.teamcode.lib.subsystems.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.OTOSLocalisationSubsystem;
 import org.firstinspires.ftc.teamcode.lib.subsystems.ShooterSubsystem;
 
-@TeleOp(name = "TeleOp")
+@TeleOp(name = "Teleop")
 public class TeleopOpMode extends OpMode {
     private DriveSubsystem drive;
     private LiftSubsystem lift;
     private IntakeSubsystem intake;
     private IndexSubsystem index;
     private ShooterSubsystem shooter;
+    // private LEDSubsystem led;
     private OTOSLocalisationSubsystem localisation;
+    private double shootTime = 0;
+    private double shooterTilt = 1;
     private LiftRaise liftRaiseCommand;
 
-    private enum ShootState {
+
+    private enum LaunchState {
         IDLE,
-        PREPARING,
-        SHOOTING
+        SPIN_UP,
+        POPPING,
+        UNPOPPING,
     }
 
-    private enum IntakeState {
-        IDLE,
-        PREPARING,
-        INTAKING,
-    }
-
-    private ShootState shootState = ShootState.IDLE;
-    private IntakeState intakeState = IntakeState.IDLE;
+    private LaunchState launchState;
     private IndexSubsystem.Mode shootMode = IndexSubsystem.Mode.SHOOT_ANY;
     private final ElapsedTime timer = new ElapsedTime();
-    private double shootTime = 0;
-    private double intakeTime = 0;
-    private boolean intakenRecently = false;
 
     @Override
     public void init() {
@@ -49,8 +44,8 @@ public class TeleopOpMode extends OpMode {
         intake = new IntakeSubsystem(hardwareMap, telemetry);
         index = new IndexSubsystem(hardwareMap, telemetry);
         shooter = new ShooterSubsystem(hardwareMap, telemetry);
-//        led = new LEDSubsystem(hardwareMap, telemetry);
         localisation = new OTOSLocalisationSubsystem(hardwareMap, telemetry);
+        launchState = LaunchState.IDLE;
         liftRaiseCommand = new LiftRaise(localisation, lift);
     }
 
@@ -63,117 +58,88 @@ public class TeleopOpMode extends OpMode {
     public void loop() {
         drive.driveRobotRelative(-gamepad2.left_stick_y, -gamepad2.left_stick_x, -gamepad2.right_stick_x);
 
-//         select colour conditional statements
-        if (gamepad2.a) {
-            shootMode = IndexSubsystem.Mode.SHOOT_GREEN_ONLY;
-//            led.setSolidColor(Color.GREEN);
-            telemetry.addData("Current Ball", "GREEN");
-        } else if (gamepad2.x) {
-            shootMode = IndexSubsystem.Mode.SHOOT_PURPLE_ONLY;
-//            led.setSolidColor(Color.rgb(128, 0, 128)); // purple
-            telemetry.addData("Current Ball", "PURPLE");
-        } else if (gamepad2.b) {
-            shootMode = IndexSubsystem.Mode.SHOOT_ANY;
-//            led.setMode(LEDSubsystem.Mode.RAINBOW);
-            telemetry.addData("Current Ball", "ANY");
-        }
-
-        // intake FSM
-        if (gamepad2.left_trigger > 0.5 && intakeState == IntakeState.IDLE) {
-            intakeState = IntakeState.PREPARING;
-        } else if (gamepad2.left_trigger <= 0.5) {
-            intakeState = IntakeState.IDLE;
-        }
-
-        switch (intakeState) {
-            case IDLE:
-                // Reset everything
-                intake.setPower(0);
-                break;
-
-            case PREPARING:
-                // primes the indexer
-                index.setMode(IndexSubsystem.Mode.INTAKE);
-                intake.setPower(0);
-                if (index.atTarget()) {
-                    intakeState = IntakeState.INTAKING;
-                }
-                break;
-
-            case INTAKING:
-                // Pulls the ball in
-                intake.setPower(1);
-                if (index.ballIntaken()) {
-                    intakeState = IntakeState.PREPARING;
-                }
-                break;
-        }
-
-        // Shooter arc control
-        if (gamepad2.dpad_up) {
-            shooter.setTilt(shooter.getTilt() + 0.05);
-        } else if (gamepad2.dpad_down) {
-            shooter.setTilt(shooter.getTilt() - 0.05);
-        }
-
-        // Shoot state FSM
-        if (gamepad2.right_trigger > 0.5 && shootState == ShootState.IDLE) {
-            shootState = ShootState.PREPARING;
-        } else if (gamepad2.right_trigger <= 0.5) {
-            shootState = ShootState.IDLE;
-        }
-
-        if (gamepad1.right_trigger > 0.5) {
-            shooter.setSpeed(gamepad2.y ? 0.5 : 2);
+        // for human player intake
+        if (gamepad1.left_trigger > 0.5 || gamepad2.left_trigger > 0.5) {
+            index.setMode(IndexSubsystem.Mode.INTAKE); // switch to indexer slot
+            intake.setPower(1);
         } else {
-            shooter.setSpeed(0);
+            intake.setPower(0);
         }
 
-        switch (shootState) {
+        if (gamepad1.a || gamepad2.a) {
+            shootMode = IndexSubsystem.Mode.SHOOT_GREEN_ONLY;
+        } else if (gamepad1.x || gamepad2.x) {
+            shootMode = IndexSubsystem.Mode.SHOOT_PURPLE_ONLY;
+        } else if (gamepad1.b || gamepad2.b) {
+            shootMode = IndexSubsystem.Mode.SHOOT_ANY;
+        }
+        telemetry.addData("Shooting Mode", shootMode);
+
+        boolean revInput = gamepad1.right_trigger > 0.5 || gamepad2.right_trigger > 0.5;
+        boolean shootInput = gamepad1.y || gamepad2.y;
+
+        if (revInput && launchState == LaunchState.IDLE) {
+            launchState = LaunchState.SPIN_UP;
+            shootTime = timer.time();
+        } else if (!revInput) {
+            launchState = LaunchState.IDLE;
+        }
+
+        switch (launchState) {
             case IDLE:
-                if (gamepad1.right_trigger <= 0.5) {
-                    shooter.setSpeed(0);
-                }
+                shooter.setSpeed(0);
                 shooter.unpop();
                 break;
 
-            case PREPARING:
+            case SPIN_UP:
+                shooter.setSpeed(67);
                 index.setMode(shootMode);
-                shooter.setSpeed(gamepad2.y ? 0.5 : 2);
-                if (index.atTarget() && shooter.getMotorSpeed() > 67 && gamepad2.right_trigger > 0.5) {
-                    shootState = ShootState.SHOOTING;
+                if (Math.abs(shooter.getMotorSpeed() - 65) < 0.5 && timer.time() - shootTime > 1 && revInput && shootInput) {
+                    launchState = LaunchState.POPPING;
                     shootTime = timer.time();
                 }
                 break;
 
-            case SHOOTING:
+            case POPPING:
                 shooter.pop();
-                shootMode = IndexSubsystem.Mode.SHOOT_ANY;
-
                 if (timer.time() - shootTime > 0.5) {
-                    shooter.unpop();
+                    shootTime = timer.time();
+                    launchState = LaunchState.UNPOPPING;
+                }
+                break;
+
+            case UNPOPPING:
+                shooter.unpop();
+                if (timer.time() - shootTime > 0.5) {
                     index.emptyCurrentSlot();
-                    shootState = ShootState.PREPARING;
+                    launchState = LaunchState.SPIN_UP;
                 }
                 break;
         }
 
         // Raises or lowers lift
-        if (gamepad2.rightBumperWasPressed()) {
+        // lift control
+        if (gamepad1.rightBumperWasPressed()) {
             liftRaiseCommand.start();
-        } else if (gamepad2.right_bumper) {
+        } else if (gamepad1.right_bumper) {
             liftRaiseCommand.execute();
-        } else if (gamepad2.rightBumperWasReleased()) {
+        } else if (gamepad1.rightBumperWasReleased()) {
             liftRaiseCommand.end();
         }
+
+        // Shooter arc control
+        if (gamepad2.dpad_up || gamepad1.dpad_up) {
+            shooterTilt = Math.min(shooterTilt + 0.01, 1);
+        } else if (gamepad2.dpad_down || gamepad1.dpad_down) {
+            shooterTilt = Math.max(shooterTilt - 0.01, 0);
+        }
+        shooter.setTilt(shooterTilt);
 
         drive.periodic();
         lift.periodic();
         intake.periodic();
         index.periodic();
         shooter.periodic();
-        localisation.periodic();
-//        led.periodic();
         telemetry.update();
     }
 }

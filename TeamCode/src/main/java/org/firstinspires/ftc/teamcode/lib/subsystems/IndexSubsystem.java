@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -39,7 +40,7 @@ public class IndexSubsystem extends SubsystemBase {
     private static final float[] TOP_GREEN_MIN_HSV = new float[]{120, 0.5f, 0}; // TODO: tune
     private static final float[] TOP_GREEN_MAX_HSV = new float[]{180, 1, 1}; // TODO: tune
 
-    private static final double[] INTAKE_ROTATIONS = new double[]{Math.toRadians(116), Math.toRadians(240), Math.toRadians(0)}; // TODO: tune
+    private static final double[] INTAKE_ROTATIONS = new double[]{Math.toRadians(106), Math.toRadians(230), Math.toRadians(350)}; // TODO: tune
     private static final double[] SHOOT_ROTATIONS = new double[]{Math.toRadians(280), Math.toRadians(40), Math.toRadians(162)}; // TODO: tune
 
     public enum Ball {
@@ -54,11 +55,13 @@ public class IndexSubsystem extends SubsystemBase {
     private final NormalizedColorSensor sideColorSensor;
     private final NormalizedColorSensor topColorSensor;
     private final Ball[] storage = new Ball[]{Ball.EMPTY, Ball.EMPTY, Ball.EMPTY};
+    private final ElapsedTime timer = new ElapsedTime();
     private Mode mode = Mode.IDLE;
     private double rotation = 0;
     private boolean atTarget = false;
     private boolean ballRecentlyIntaken = false;
     private int manualIndex = 0;
+    private double lastIntakeTime = timer.time();
 
     public IndexSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
@@ -226,16 +229,12 @@ public class IndexSubsystem extends SubsystemBase {
      */
     private int closestSlot(double[] rotations, Function<Integer, Boolean> predicate) {
         int closestSlotIndex = -1;
-        double minError = Double.POSITIVE_INFINITY;
         for (int i = 0; i < 3; i++) {
-            if (!predicate.apply(i)) continue;
-            double error = wrappedSignedAngleBetween(rotations[i], rotation);
-            if (Math.abs(error) < Math.abs(minError)) {
-                minError = error;
+            if (predicate.apply(i)) {
                 closestSlotIndex = i;
+                break;
             }
         }
-
         return closestSlotIndex;
     }
 
@@ -255,15 +254,17 @@ public class IndexSubsystem extends SubsystemBase {
      * @param slotIndex The index to store the detected ball in
      */
     private void detectEnteringBalls(int slotIndex) {
-        if (slotIndex == -1) return;
+        if (slotIndex == -1 || timer.time() - lastIntakeTime < 1.5) return;
         float[] topHsv = getTopHSV();
         float[] sideHsv = getSideHSV();
         if (hsvInRange(topHsv, TOP_GREEN_MIN_HSV, TOP_GREEN_MAX_HSV) || hsvInRange(sideHsv, SIDE_GREEN_MIN_HSV, SIDE_GREEN_MAX_HSV)) {
             storage[slotIndex] = Ball.GREEN;
             ballRecentlyIntaken = true;
+            lastIntakeTime = timer.time();
         } else if (hsvInRange(topHsv, TOP_PURPLE_MIN_HSV, TOP_PURPLE_MAX_HSV) || hsvInRange(sideHsv, SIDE_PURPLE_MIN_HSV, SIDE_PURPLE_MAX_HSV)) {
             storage[slotIndex] = Ball.PURPLE;
             ballRecentlyIntaken = true;
+            lastIntakeTime = timer.time();
         }
     }
 
@@ -317,8 +318,10 @@ public class IndexSubsystem extends SubsystemBase {
         switch (mode) {
             case INTAKE:
                 rotations = INTAKE_ROTATIONS;
-                closestSlotIndex = closestSlot(INTAKE_ROTATIONS, (i) -> storage[i] == Ball.EMPTY);
-                detectEnteringBalls(closestSlotIndex);
+                if (timer.time() - lastIntakeTime >= 0.5) {
+                    closestSlotIndex = closestSlot(INTAKE_ROTATIONS, (i) -> storage[i] == Ball.EMPTY);
+                    detectEnteringBalls(closestSlotIndex);
+                }
                 break;
             case SHOOT_ANY:
                 rotations = SHOOT_ROTATIONS;
