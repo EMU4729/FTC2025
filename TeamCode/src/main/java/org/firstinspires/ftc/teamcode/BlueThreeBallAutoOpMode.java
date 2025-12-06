@@ -46,7 +46,7 @@ public class BlueThreeBallAutoOpMode extends LinearOpMode {
         do {
             gyroStraightCommand.execute();
             periodic();
-        } while (timer.time() <= 1.5 && opModeIsActive());
+        } while (timer.time() <= 1 && opModeIsActive());
         gyroStraightCommand.end();
 
         // wait for motif detection
@@ -130,7 +130,7 @@ public class BlueThreeBallAutoOpMode extends LinearOpMode {
         // leave
         timer.reset();
         do {
-            drive.driveRobotRelative(0, 1, 0);
+            drive.driveRobotRelative(-0.3, 1, 0);
             periodic();
         } while (timer.time() < 1 && opModeIsActive());
 

@@ -126,7 +126,7 @@ public class OTOSLocalisationSubsystem {
         for (AprilTagDetection detection : freshDetections) {
             // handle obelisk tags
             if (detection.metadata.id >= 21 && detection.metadata.id <= 23) {
-                if (obeliskId == -1) obeliskId = detection.metadata.id;
+                obeliskId = detection.metadata.id;
                 continue;
             }
 

@@ -38,7 +38,7 @@ public class LiftRaise {
         double rightPower = -correction - 1;
 
         leftPower = Math.max(-1, Math.min(1, leftPower));
-        rightPower = Math.max(-1, Math.min(1, rightPower));
+        rightPower = Math.max(-1, Math.min(1, rightPower * 1.3));
 
         lift.setLeftPower(leftPower);
         lift.setRightPower(rightPower);
