@@ -124,7 +124,7 @@ public class TeleopOpMode extends OpMode {
                 // TRANSITIONS
                 if (!intakeInput) {
                     launchState = LaunchState.IDLE; // LT Released
-                } else if (index.getDetectedBallColour() != IndexSubsystem.Ball.EMPTY && intakeTimer.time() > 0.5) {
+                } else if (index.getDetectedBallColour() != IndexSubsystem.Ball.EMPTY) {
                     // Color sensor detects ball -> Move to confirmation
                     launchState = LaunchState.CONFIRM_INTAKE;
                     intakeTimer.reset();
@@ -177,6 +177,8 @@ public class TeleopOpMode extends OpMode {
                 }
                 break;
         }
+
+        telemetry.addData("FSM State", launchState);
 
         // Raises or lowers lift
         // lift control

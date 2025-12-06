@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -55,13 +54,11 @@ public class IndexSubsystem extends SubsystemBase {
     private final NormalizedColorSensor sideColorSensor;
     private final NormalizedColorSensor topColorSensor;
     private final Ball[] storage = new Ball[]{Ball.EMPTY, Ball.EMPTY, Ball.EMPTY};
-    private final ElapsedTime timer = new ElapsedTime();
     private Mode mode = Mode.IDLE;
     private double rotation = 0;
     private boolean atTarget = false;
     private boolean ballRecentlyIntaken = false;
     private int manualIndex = 0;
-    private double lastIntakeTime = timer.time();
 
     public IndexSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
@@ -312,7 +309,6 @@ public class IndexSubsystem extends SubsystemBase {
         if (closestSlotIndex != -1) {
             storage[closestSlotIndex] = ball;
             ballRecentlyIntaken = true;
-            lastIntakeTime = timer.time();
         }
     }
 
