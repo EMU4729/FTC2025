@@ -31,6 +31,7 @@ public class TeleopOpMode extends OpMode {
 
     private enum LaunchState {
         IDLE,
+        REVERSE_INTAKE,
         INTAKING,
         CONFIRM_INTAKE,
         SPIN_UP,
@@ -63,21 +64,9 @@ public class TeleopOpMode extends OpMode {
 
     @Override
     public void loop() {
-        boolean intakeInput = gamepad1.left_trigger > 0.5 || gamepad2.left_trigger > 0.5;
         drive.driveRobotRelative(-gamepad2.left_stick_y, -gamepad2.left_stick_x, -gamepad2.right_stick_x);
 
-        // for human player intake
-        if (intakeInput) {
-            launchState = LaunchState.INTAKING;
-
-            //index.setMode(IndexSubsystem.Mode.INTAKE); // switch to indexer slot
-            //intake.setPower(1);
-        } else if (gamepad1.left_bumper || gamepad2.left_bumper) {
-            intake.setPower(-1);
-        } else {
-            intake.setPower(0);
-        }
-
+        // colour selection
         if (gamepad1.a || gamepad2.a) {
             shootMode = IndexSubsystem.Mode.SHOOT_GREEN_ONLY;
             led.setSolidColor(Color.GREEN);
@@ -91,21 +80,41 @@ public class TeleopOpMode extends OpMode {
         led.setMode(LEDSubsystem.Mode.SOLID);
         telemetry.addData("Shooting Mode", shootMode);
 
+        // for human player intake
+        boolean intakeInput = gamepad1.left_trigger > 0.5 || gamepad2.left_trigger > 0.5;
+        boolean reverseIntakeInput = gamepad1.left_bumper || gamepad2.left_bumper;
         boolean revInput = gamepad1.right_trigger > 0.5 || gamepad2.right_trigger > 0.5;
-
         boolean shootInput = gamepad1.y || gamepad2.y;
-
-        if (revInput && launchState == LaunchState.IDLE) {
-            launchState = LaunchState.SPIN_UP;
-            shootTime = timer.time();
-        } else if (!revInput) {
-            launchState = LaunchState.IDLE;
-        }
 
         switch (launchState) {
             case IDLE:
+                intake.setPower(0);
                 shooter.setSpeed(0);
                 shooter.unpop();
+
+                // TRANSITIONS
+                if (intakeInput) {
+                    // LT Pressed
+                    launchState = LaunchState.INTAKING;
+                    intakeTimer.reset();
+                } else if (revInput) {
+                    // RT Pressed
+                    launchState = LaunchState.SPIN_UP;
+                    shootTime = timer.time();
+                } else if (reverseIntakeInput) {
+                    // LB Pressed
+                    launchState = LaunchState.REVERSE_INTAKE;
+                }
+                break;
+
+            case REVERSE_INTAKE:
+                intake.setPower(-1);
+
+                // TRANSITIONS
+                if (!reverseIntakeInput) {
+                    // LB released
+                    launchState = LaunchState.IDLE;
+                }
                 break;
 
             case INTAKING:
@@ -115,23 +124,22 @@ public class TeleopOpMode extends OpMode {
                 // TRANSITIONS
                 if (!intakeInput) {
                     launchState = LaunchState.IDLE; // LT Released
-                }
-                else if (index.isBallDetected() && intakeTimer.time() > 0.5) {
+                } else if (index.getDetectedBallColour() != IndexSubsystem.Ball.EMPTY && intakeTimer.time() > 0.5) {
                     // Color sensor detects ball -> Move to confirmation
                     launchState = LaunchState.CONFIRM_INTAKE;
                     intakeTimer.reset();
                 }
                 break;
+
             case CONFIRM_INTAKE:
                 intake.setPower(1); // Same as Intaking
                 index.setMode(IndexSubsystem.Mode.INTAKE);
 
                 // TRANSITIONS
-                if (!index.isBallDetected()) {
+                if (index.getDetectedBallColour() == IndexSubsystem.Ball.EMPTY) {
                     // Ball lost (sensor stops detecting) -> go back to Intaking
                     launchState = LaunchState.INTAKING;
-                }
-                else if (intakeTimer.time() > 0.5) {
+                } else if (intakeTimer.time() > 0.5) {
                     // 0.5 seconds passed with ball detected -> Set indexer storage slot
                     IndexSubsystem.Ball ballColor = index.getDetectedBallColour();
                     index.setBallInIntakeSlot(ballColor);
@@ -139,18 +147,17 @@ public class TeleopOpMode extends OpMode {
                     // Loop back to Intaking to get the next ball
                     launchState = LaunchState.INTAKING;
                 }
-                // Note: If LT is released here, we might want to go IDLE,
-                // but the diagram implies the cycle completes first.
-                // Usually, you check !intakeInput here too if you want instant stop.
-                if (!intakeInput) launchState = LaunchState.IDLE;
                 break;
 
             case SPIN_UP:
+                intake.setPower(0);
                 shooter.setSpeed(67);
                 index.setMode(shootMode);
                 if (Math.abs(shooter.getMotorSpeed() - 65) < 0.5 && timer.time() - shootTime > 1 && revInput && shootInput) {
                     launchState = LaunchState.POPPING;
                     shootTime = timer.time();
+                } else if (!revInput) {
+                    launchState = LaunchState.IDLE;
                 }
                 break;
 
@@ -182,10 +189,9 @@ public class TeleopOpMode extends OpMode {
         }
 
         //  FAILSAFE IN CASE MY FSM SUCK
-        if (gamepad1.start && gamepad1.dpad_right){
+        if (gamepad1.start && gamepad1.dpad_right) {
             index.setManualIndex(-1);
         }
-
 
         // Shooter arc control
         if (gamepad2.dpad_up || gamepad1.dpad_up) {
