@@ -31,6 +31,8 @@ public class TeleopOpMode extends OpMode {
 
     private enum LaunchState {
         IDLE,
+        INTAKE,
+        CONFIRM_INTAKE,
         SPIN_UP,
         POPPING,
         UNPOPPING,
