@@ -21,6 +21,7 @@ public class IndexSubsystem extends SubsystemBase {
     public enum Mode {
         IDLE,
         INTAKE,
+        CONFRIM_INTAKE,
         SHOOT_ANY,
         SHOOT_PURPLE_ONLY,
         SHOOT_GREEN_ONLY,
@@ -310,6 +311,53 @@ public class IndexSubsystem extends SubsystemBase {
         storage[closestSlotIndex] = Ball.EMPTY;
     }
 
+    /**
+     * 1. Detects if the color sensor is currently seeing a ball (Green or Purple).
+     * @return true if a ball is detected by Top or Side sensor.
+     */
+    public boolean isBallDetected() {
+        float[] topHsv = getTopHSV();
+        float[] sideHsv = getSideHSV();
+
+        boolean topDetected = hsvInRange(topHsv, TOP_GREEN_MIN_HSV, TOP_GREEN_MAX_HSV) ||
+                hsvInRange(topHsv, TOP_PURPLE_MIN_HSV, TOP_PURPLE_MAX_HSV);
+
+        boolean sideDetected = hsvInRange(sideHsv, SIDE_GREEN_MIN_HSV, SIDE_GREEN_MAX_HSV) ||
+                hsvInRange(sideHsv, SIDE_PURPLE_MIN_HSV, SIDE_PURPLE_MAX_HSV);
+
+        return topDetected || sideDetected;
+    }
+
+    /**
+     * 2. Gets the specific color of the ball currently detected.
+     * @return Ball.GREEN, Ball.PURPLE, or Ball.EMPTY.
+     */
+    public Ball getDetectedBallColour() {
+        float[] topHsv = getTopHSV();
+        float[] sideHsv = getSideHSV();
+
+        if (hsvInRange(topHsv, TOP_GREEN_MIN_HSV, TOP_GREEN_MAX_HSV) ||
+                hsvInRange(sideHsv, SIDE_GREEN_MIN_HSV, SIDE_GREEN_MAX_HSV)) {
+            return Ball.GREEN;
+        }
+        else if (hsvInRange(topHsv, TOP_PURPLE_MIN_HSV, TOP_PURPLE_MAX_HSV) ||
+                hsvInRange(sideHsv, SIDE_PURPLE_MIN_HSV, SIDE_PURPLE_MAX_HSV)) {
+            return Ball.PURPLE;
+        }
+
+        return Ball.EMPTY;
+    }
+
+    public void setBallInIntakeSlot(Ball ball) {
+        // Find the closest empty slot that aligns with intake rotations
+        int closestSlotIndex = closestSlot(INTAKE_ROTATIONS, (i) -> storage[i] == Ball.EMPTY);
+
+        if (closestSlotIndex != -1) {
+            storage[closestSlotIndex] = ball;
+            ballRecentlyIntaken = true;
+            lastIntakeTime = timer.time();
+        }
+    }
     @Override
     public void periodic() {
         updateRotation();
@@ -331,10 +379,11 @@ public class IndexSubsystem extends SubsystemBase {
         switch (mode) {
             case INTAKE:
                 rotations = INTAKE_ROTATIONS;
-                if (timer.time() - lastIntakeTime >= 0.5) {
-                    closestSlotIndex = closestSlot(INTAKE_ROTATIONS, (i) -> storage[i] == Ball.EMPTY);
-                    detectEnteringBalls(closestSlotIndex);
-                }
+                closestSlotIndex = closestSlot(INTAKE_ROTATIONS, (i) -> storage[i] == Ball.EMPTY);
+                //if (timer.time() - lastIntakeTime >= 0.5) {
+                //    closestSlotIndex = closestSlot(INTAKE_ROTATIONS, (i) -> storage[i] == Ball.EMPTY);
+                /////    detectEnteringBalls(closestSlotIndex);
+                //}
                 break;
             case SHOOT_ANY:
                 rotations = SHOOT_ROTATIONS;
